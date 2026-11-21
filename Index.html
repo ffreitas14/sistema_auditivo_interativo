@@ -1,0 +1,2804 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema Auditivo Humano — Projeto de Ciências Interativo</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --wave-dur: 1.5s;
+      --vib-dur: 0.65s;
+      --nerve-dur: 1.0s;
+      --tymp-scale: 1.09;
+      --oss-shift: 3px;
+      --oss-rot: 3deg;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+
+    /* Animações das ondas sonoras e estruturas do ouvido */
+    @keyframes waveTravel {
+      0% {
+        transform: translateX(-18px);
+        opacity: 0.15;
+      }
+      50% {
+        opacity: 0.95;
+      }
+      100% {
+        transform: translateX(22px);
+        opacity: 0.1;
+      }
+    }
+
+    @keyframes tympanumPulse {
+      0%, 100% {
+        transform: scale(1);
+      }
+      50% {
+        transform: scale(var(--tymp-scale));
+      }
+    }
+
+    @keyframes ossiclesRock {
+      0%, 100% {
+        transform: rotate(0deg) translateX(0px);
+      }
+      50% {
+        transform: rotate(var(--oss-rot)) translateX(var(--oss-shift));
+      }
+    }
+
+    @keyframes stapesPiston {
+      0%, 100% {
+        transform: translateX(0px);
+      }
+      50% {
+        transform: translateX(calc(var(--oss-shift) * 1.15));
+      }
+    }
+
+    @keyframes cochlearRipple {
+      0% {
+        stroke-dashoffset: 48;
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 0.95;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 0.35;
+      }
+    }
+
+    @keyframes nerveSpark {
+      0% {
+        stroke-dashoffset: 80;
+        opacity: 0.35;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        stroke-dashoffset: 0;
+        opacity: 0.35;
+      }
+    }
+
+    @keyframes spotHaloPulse {
+      0%, 100% {
+        transform: scale(0.9);
+        opacity: 0.75;
+      }
+      50% {
+        transform: scale(1.55);
+        opacity: 0.15;
+      }
+    }
+
+    @keyframes ciliaWave {
+      0%, 100% {
+        transform: skewX(-4deg);
+      }
+      50% {
+        transform: skewX(18deg);
+      }
+    }
+
+    @keyframes cortiUnitLift {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-5px);
+      }
+    }
+
+    @keyframes cortiSparkFlow {
+      0% {
+        stroke-dashoffset: 24;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes endolymphWave {
+      0% {
+        stroke-dashoffset: 28;
+      }
+      100% {
+        stroke-dashoffset: 0;
+      }
+    }
+
+    @keyframes basilarSwell {
+      0%, 100% {
+        transform: translateY(0px);
+      }
+      50% {
+        transform: translateY(-4px);
+      }
+    }
+
+    #sound-waves {
+      animation: waveTravel var(--wave-dur) ease-in-out infinite;
+    }
+
+    #tympanum-membrane {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: tympanumPulse var(--vib-dur) ease-in-out infinite;
+    }
+
+    #ossicles-group {
+      transform-origin: 395px 175px;
+      animation: ossiclesRock var(--vib-dur) ease-in-out infinite;
+    }
+
+    #stapes-piston-part {
+      animation: stapesPiston var(--vib-dur) ease-in-out infinite;
+    }
+
+    #cochlea-fluid-wave {
+      stroke-dasharray: 10 14;
+      animation: cochlearRipple var(--vib-dur) linear infinite;
+    }
+
+    #cochlea-active-halo {
+      transform-origin: center;
+      transform-box: fill-box;
+      animation: spotHaloPulse 1.2s ease-in-out infinite;
+    }
+
+    #nerve-impulses,
+    #nerve-impulses-2 {
+      stroke-dasharray: 10 14;
+      animation: nerveSpark var(--nerve-dur) linear infinite;
+    }
+
+    #nerve-impulses-2 {
+      animation-delay: -0.45s;
+    }
+
+    /* Quando o microfone ao vivo está ativo, o JS assume o controle frame a frame */
+    svg.mic-driven #sound-waves,
+    svg.mic-driven #tympanum-membrane,
+    svg.mic-driven #ossicles-group,
+    svg.mic-driven #stapes-piston-part {
+      animation: none !important;
+    }
+
+    .corti-cilia-anim {
+      transform-origin: bottom center;
+      transform-box: fill-box;
+      animation: ciliaWave 0.95s ease-in-out infinite;
+    }
+
+    .corti-basilar-anim {
+      animation: cortiUnitLift 0.95s ease-in-out infinite;
+    }
+
+    .corti-unit-1 {
+      animation: cortiUnitLift 0.95s ease-in-out infinite;
+      animation-delay: 0s;
+    }
+    .corti-unit-1 .corti-cilia-anim {
+      animation-delay: 0s;
+    }
+
+    .corti-unit-2 {
+      animation: cortiUnitLift 0.95s ease-in-out infinite;
+      animation-delay: 0.14s;
+    }
+    .corti-unit-2 .corti-cilia-anim {
+      animation-delay: 0.14s;
+    }
+
+    .corti-unit-3 {
+      animation: cortiUnitLift 0.95s ease-in-out infinite;
+      animation-delay: 0.28s;
+    }
+    .corti-unit-3 .corti-cilia-anim {
+      animation-delay: 0.28s;
+    }
+
+    .corti-unit-4 {
+      animation: cortiUnitLift 0.95s ease-in-out infinite;
+      animation-delay: 0.42s;
+    }
+    .corti-unit-4 .corti-cilia-anim {
+      animation-delay: 0.42s;
+    }
+
+    .corti-spark-line {
+      animation: cortiSparkFlow 0.7s linear infinite;
+    }
+
+    .corti-fluid-line {
+      animation: endolymphWave 1.4s linear infinite;
+    }
+
+    /* Estado de células lesionadas por ruído alto */
+    #corti-svg.corti-damaged .corti-cilia-anim {
+      animation: none !important;
+      transform: scaleY(0.32) skewX(38deg);
+      stroke: #fb7185;
+    }
+
+    #corti-svg.corti-damaged .corti-hair-body {
+      opacity: 0.45;
+      filter: grayscale(0.75);
+    }
+
+    #corti-svg.corti-damaged .corti-spark-line {
+      animation: none !important;
+    }
+
+    /* Destaque para estrutura selecionada no SVG */
+    .structure-group {
+      cursor: pointer;
+      transition: filter 0.25s ease, transform 0.25s ease;
+    }
+
+    .structure-group:hover {
+      filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.7));
+    }
+
+    .structure-group.active-part {
+      filter: drop-shadow(0 0 12px rgba(79, 70, 229, 0.95));
+    }
+
+    .structure-group.active-part .part-highlight {
+      stroke: #4f46e5 !important;
+      stroke-width: 3.5px !important;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col selection:bg-indigo-500 selection:text-white">
+
+  <!-- Cabeçalho Principal -->
+  <header class="sticky top-0 z-30 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-md">
+          <i class="fa-solid fa-ear-listen text-lg"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+              Sistema Auditivo Humano
+            </h1>
+            <span id="mic-live-badge" class="hidden px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-600 text-white animate-pulse">
+              AO VIVO
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400">
+            Explorador Anatômico, Acústico &amp; Fisiológico — Projeto de Ciências
+          </p>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas da Feira de Ciências -->
+      <div class="flex flex-wrap items-center gap-2">
+        <button id="btn-mic" type="button" onclick="toggleMicInput()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 transition flex items-center gap-1.5">
+          <i class="fa-solid fa-microphone"></i>
+          <span id="mic-label">Mic ao Vivo</span>
+        </button>
+
+        <button type="button" onclick="toggleGuideModal()" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm transition flex items-center gap-1.5">
+          <i class="fa-solid fa-chalkboard-user"></i>
+          <span>Roteiro de Apresentação</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Barra de Navegação entre Módulos -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex items-center gap-2 overflow-x-auto">
+      <button id="tab-btn-anatomia" type="button" onclick="switchTab('anatomia')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-lungs-virus hidden"></i>
+        <i class="fa-solid fa-sitemap"></i>
+        <span>1. Anatomia &amp; Transdução</span>
+      </button>
+
+      <button id="tab-btn-acustica" type="button" onclick="switchTab('acustica')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-wave-square"></i>
+        <span>2. Laboratório Acústico (Hz &amp; dB)</span>
+      </button>
+
+      <button id="tab-btn-condicoes" type="button" onclick="switchTab('condicoes')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-stethoscope"></i>
+        <span>3. Simulador de Condições</span>
+      </button>
+
+      <button id="tab-btn-quiz" type="button" onclick="switchTab('quiz')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 whitespace-nowrap">
+        <i class="fa-solid fa-circle-question"></i>
+        <span>4. Quiz Científico</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 py-6 space-y-6">
+
+    <!-- ===================================================================== -->
+    <!-- ABA 1: ANATOMIA & TRANSDUÇÃO                                          -->
+    <!-- ===================================================================== -->
+    <section id="tab-anatomia" class="space-y-5">
+      <!-- Pílulas de Seleção Rápida -->
+      <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+        <div class="flex items-center justify-between gap-2 mb-2.5">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Selecione uma estrutura no diagrama ou clique abaixo:
+          </span>
+        </div>
+        <div id="structure-pills" class="flex flex-wrap gap-1.5"></div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <!-- Coluna Esquerda: Diagrama Anatômico Interativo SVG -->
+        <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-4">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2 text-xs font-semibold">
+              <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Orelha Externa</span>
+              <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">Orelha Média</span>
+              <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">Orelha Interna</span>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button id="btn-quick-sound" type="button" onclick="toggleAudioEngine()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition flex items-center gap-1.5">
+                <i id="quick-sound-icon" class="fa-solid fa-volume-high"></i>
+                <span id="quick-sound-label">Testar Som</span>
+              </button>
+
+              <button type="button" onclick="toggleWaveAnimation()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5">
+                <i id="wave-icon" class="fa-solid fa-pause"></i>
+                <span id="wave-label">Pausar Ondas</span>
+              </button>
+
+              <button type="button" onclick="openCortiModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition flex items-center gap-1.5">
+                <i class="fa-solid fa-microscope"></i>
+                <span>Ampliar Órgão de Corti</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Barra de Resposta Acústica em Tempo Real -->
+          <div class="flex flex-wrap items-center justify-between gap-3 px-3.5 py-2 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700/80 text-xs">
+            <div class="flex items-center gap-2">
+              <span id="model-status-dot" class="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+              <span id="model-status-text" class="font-semibold text-slate-700 dark:text-slate-200">Simulação: 440 Hz • 65 dB</span>
+            </div>
+            <div class="flex items-center gap-2 flex-1 max-w-[200px]">
+              <span class="text-[11px] text-slate-400 font-semibold">Intensidade:</span>
+              <div class="flex-1 h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <div id="model-vu-bar" style="width: 45%;" class="h-full bg-gradient-to-r from-sky-500 via-indigo-500 to-rose-500 transition-all duration-75"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SVG Anatômico Vetorial Completo -->
+          <div class="relative w-full overflow-hidden rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border border-slate-200/80 dark:border-slate-800">
+            <svg id="ear-svg" viewBox="0 0 820 440" class="w-full h-auto block select-none" role="img" aria-label="Diagrama interativo do sistema auditivo humano">
+              <defs>
+                <!-- Gradientes das Zonas Anatômicas -->
+                <linearGradient id="bgZones" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
+                  <stop offset="42%" stop-color="#fef3c7" stop-opacity="0.45" />
+                  <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.55" />
+                </linearGradient>
+
+                <!-- Textura e Gradiente do Osso Temporal -->
+                <linearGradient id="temporalBoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#f5e6d3" />
+                  <stop offset="50%" stop-color="#ead2b7" />
+                  <stop offset="100%" stop-color="#dec09f" />
+                </linearGradient>
+
+                <pattern id="boneTrabeculae" width="16" height="16" patternUnits="userSpaceOnUse">
+                  <circle cx="4" cy="4" r="2.2" fill="#d4b08c" opacity="0.35" />
+                  <circle cx="12" cy="11" r="2.8" fill="#c89f76" opacity="0.3" />
+                  <circle cx="13" cy="3" r="1.4" fill="#fff7ed" opacity="0.45" />
+                </pattern>
+
+                <!-- Pavilhão Auricular (Pele e Cartilagem) -->
+                <linearGradient id="pinnaSkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffd8be" />
+                  <stop offset="55%" stop-color="#f8b496" />
+                  <stop offset="100%" stop-color="#e59273" />
+                </linearGradient>
+
+                <!-- Canal Auditivo -->
+                <linearGradient id="canalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#d97757" />
+                  <stop offset="30%" stop-color="#f4a27e" />
+                  <stop offset="70%" stop-color="#f8b99a" />
+                  <stop offset="100%" stop-color="#c96849" />
+                </linearGradient>
+
+                <!-- Cavidade Timpânica (Orelha Média) -->
+                <radialGradient id="middleEarCavity" cx="50%" cy="45%" r="55%">
+                  <stop offset="0%" stop-color="#fffbeb" />
+                  <stop offset="70%" stop-color="#fde68a" />
+                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.45" />
+                </radialGradient>
+
+                <!-- Tímpano Translúcido -->
+                <radialGradient id="tympanumGrad" cx="45%" cy="50%" r="55%">
+                  <stop offset="0%" stop-color="#ffe4e6" />
+                  <stop offset="65%" stop-color="#fda4af" />
+                  <stop offset="100%" stop-color="#e11d48" />
+                </radialGradient>
+
+                <!-- Ossículos (Marfim 3D) -->
+                <linearGradient id="boneOssicleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#ffffff" />
+                  <stop offset="55%" stop-color="#e2e8f0" />
+                  <stop offset="100%" stop-color="#94a3b8" />
+                </linearGradient>
+
+                <!-- Labirinto e Cóclea (3D Azul/Índigo) -->
+                <linearGradient id="labyrinthTubeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#a5b4fc" />
+                  <stop offset="50%" stop-color="#6366f1" />
+                  <stop offset="100%" stop-color="#3730a3" />
+                </linearGradient>
+
+                <radialGradient id="cochleaShellGrad" cx="38%" cy="35%" r="65%">
+                  <stop offset="0%" stop-color="#c7d2fe" />
+                  <stop offset="40%" stop-color="#6366f1" />
+                  <stop offset="85%" stop-color="#3730a3" />
+                  <stop offset="100%" stop-color="#1e1b4b" />
+                </radialGradient>
+
+                <!-- Nervo Auditivo & Cérebro -->
+                <linearGradient id="nerveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#fef08a" />
+                  <stop offset="60%" stop-color="#facc15" />
+                  <stop offset="100%" stop-color="#eab308" />
+                </linearGradient>
+
+                <radialGradient id="brainCortexGrad" cx="40%" cy="40%" r="60%">
+                  <stop offset="0%" stop-color="#fbcfe8" />
+                  <stop offset="70%" stop-color="#f472b6" />
+                  <stop offset="100%" stop-color="#db2777" />
+                </radialGradient>
+
+                <filter id="softShadow" x="-10%" y="-10%" width="125%" height="125%">
+                  <feDropShadow dx="1" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.18" />
+                </filter>
+
+                <filter id="glowYellow" x="-40%" y="-40%" width="180%" height="180%">
+                  <feGaussianBlur stdDeviation="3" result="blur" />
+                  <feMerge>
+                    <feMergeNode in="blur" />
+                    <feMergeNode in="SourceGraphic" />
+                  </feMerge>
+                </filter>
+              </defs>
+
+              <!-- Fundo dividido por regiões anatômicas -->
+              <rect x="0" y="0" width="820" height="440" fill="url(#bgZones)" />
+              <line x1="345" y1="20" x2="345" y2="420" stroke="#94a3b8" stroke-dasharray="5 5" stroke-opacity="0.45" />
+              <line x1="538" y1="20" x2="538" y2="420" stroke="#94a3b8" stroke-dasharray="5 5" stroke-opacity="0.45" />
+
+              <!-- Rótulos das Divisões -->
+              <text x="172" y="28" text-anchor="middle" fill="#0284c7" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA EXTERNA</text>
+              <text x="442" y="28" text-anchor="middle" fill="#d97706" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA MÉDIA</text>
+              <text x="680" y="28" text-anchor="middle" fill="#4f46e5" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA INTERNA &amp; CÉREBRO</text>
+
+              <!-- Corte Anatômico do Osso Temporal (Estrutura de Suporte) -->
+              <g opacity="0.92">
+                <path d="M 155 152 Q 245 148 338 144 C 385 112, 488 106, 535 128 C 555 82, 635 82, 652 135 C 685 150, 692 265, 655 292 C 620 322, 558 316, 528 286 C 492 292, 456 296, 434 304 L 408 398 L 372 398 L 398 294 C 368 286, 350 274, 338 260 Q 245 258 155 254 Z" fill="url(#temporalBoneGrad)" stroke="#c89f76" stroke-width="2" />
+                <path d="M 155 152 Q 245 148 338 144 C 385 112, 488 106, 535 128 C 555 82, 635 82, 652 135 C 685 150, 692 265, 655 292 C 620 322, 558 316, 528 286 C 492 292, 456 296, 434 304 L 408 398 L 372 398 L 398 294 C 368 286, 350 274, 338 260 Q 245 258 155 254 Z" fill="url(#boneTrabeculae)" />
+              </g>
+
+              <!-- 1. Pavilhão Auricular (Anatomia Detalhada: Hélice, Anti-hélice, Concha, Trago e Lóbulo) -->
+              <g class="structure-group" data-id="pavilhao" onclick="selectStructure('pavilhao')" filter="url(#softShadow)">
+                <!-- Contorno Externo e Lóbulo -->
+                <path class="part-highlight" d="M 142 82 C 92 72, 58 122, 64 195 C 68 242, 76 276, 86 306 C 95 334, 126 346, 146 330 C 162 316, 158 288, 148 270 C 142 256, 146 240, 164 236 L 164 176 C 144 172, 148 134, 162 114 C 170 100, 160 86, 142 82 Z" fill="url(#pinnaSkinGrad)" stroke="#c26349" stroke-width="2.4" />
+                <!-- Dobra da Hélice Superior -->
+                <path d="M 148 96 C 104 88, 76 130, 80 192 C 82 222, 88 248, 96 268" fill="none" stroke="#b8573d" stroke-width="2.5" stroke-linecap="round" />
+                <!-- Anti-hélice (Dobra Interna) -->
+                <path d="M 134 118 C 106 118, 96 158, 100 198 C 103 228, 114 256, 130 264" fill="none" stroke="#c96a50" stroke-width="2.4" stroke-linecap="round" />
+                <!-- Concha da Orelha (Cavidade de Captação) -->
+                <path d="M 145 154 C 122 154, 114 178, 118 205 C 121 226, 132 238, 148 236" fill="#d97b62" fill-opacity="0.45" stroke="#b8573d" stroke-width="1.8" />
+                <!-- Trago (Pequena saliência anterior ao canal) -->
+                <path d="M 158 188 C 146 192, 146 218, 158 222" fill="#f8b496" stroke="#b8573d" stroke-width="2" stroke-linecap="round" />
+                <text x="112" y="364" text-anchor="middle" fill="#334155" font-size="12" font-weight="800">Pavilhão</text>
+              </g>
+
+              <!-- 2. Canal Auditivo Externo (Levemente curvo em "S" suave) -->
+              <g class="structure-group" data-id="canal" onclick="selectStructure('canal')">
+                <path class="part-highlight" d="M 158 178 Q 245 170 336 174 L 336 236 Q 245 232 158 234 Z" fill="url(#canalGrad)" stroke="#b45309" stroke-width="2.2" />
+                <!-- Pequenos pelos e glândulas ceruminosas protetoras -->
+                <g stroke="#92400e" stroke-width="1.4" stroke-linecap="round" opacity="0.65">
+                  <line x1="184" y1="178" x2="189" y2="186" />
+                  <line x1="205" y1="176" x2="210" y2="184" />
+                  <line x1="188" y1="233" x2="193" y2="225" />
+                  <line x1="212" y1="232" x2="217" y2="224" />
+                </g>
+                <ellipse cx="222" cy="176" rx="6" ry="2.2" fill="#f59e0b" opacity="0.85" />
+                <ellipse cx="235" cy="233" rx="5" ry="2" fill="#f59e0b" opacity="0.85" />
+                <text x="246" y="160" text-anchor="middle" fill="#334155" font-size="12" font-weight="800">Canal Auditivo</text>
+              </g>
+
+              <!-- Ondas Sonoras Animadas (Frentes de Onda entrando na Concha e no Canal) -->
+              <g id="sound-waves" fill="none" stroke-linecap="round">
+                <path d="M 22 172 Q 38 205 22 238" stroke="#0284c7" stroke-width="3" opacity="0.55" />
+                <path d="M 40 158 Q 62 205 40 252" stroke="#0284c7" stroke-width="3.2" opacity="0.8" />
+                <path d="M 58 144 Q 86 205 58 266" stroke="#0369a1" stroke-width="3.5" />
+                <!-- Frentes de compressão viajando dentro do canal -->
+                <path d="M 178 188 Q 190 205 178 222" stroke="#ffffff" stroke-width="2.6" opacity="0.85" />
+                <path d="M 225 186 Q 238 205 225 224" stroke="#ffffff" stroke-width="2.8" opacity="0.9" />
+                <path d="M 272 186 Q 286 205 272 224" stroke="#ffffff" stroke-width="3" />
+                <path d="M 312 188 Q 324 205 312 222" stroke="#ffffff" stroke-width="2.6" opacity="0.85" />
+              </g>
+
+              <!-- Cavidade da Orelha Média (Fundo) -->
+              <path d="M 342 146 C 388 122, 484 120, 526 146 L 526 266 C 492 278, 456 282, 430 290 L 404 394 L 376 394 L 400 280 C 370 272, 352 260, 342 244 Z" fill="url(#middleEarCavity)" stroke="#d97706" stroke-width="1.6" />
+
+              <!-- 7. Tuba Auditiva (Trompa de Eustáquio) -->
+              <g class="structure-group" data-id="tuba" onclick="selectStructure('tuba')">
+                <path class="part-highlight" d="M 402 272 L 376 394 L 404 394 L 428 280 Z" fill="#fcd34d" stroke="#b45309" stroke-width="2.2" />
+                <path d="M 412 285 L 390 388" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" />
+                <text x="322" y="388" text-anchor="middle" fill="#92400e" font-size="12" font-weight="800">Tuba Auditiva</text>
+              </g>
+
+              <!-- 3. Membrana Timpânica (Tímpano Cônico Translúcido) -->
+              <g id="tympanum-membrane" class="structure-group" data-id="timpano" onclick="selectStructure('timpano')" filter="url(#softShadow)">
+                <ellipse class="part-highlight" cx="340" cy="205" rx="11" ry="34" fill="url(#tympanumGrad)" stroke="#be123c" stroke-width="2.6" />
+                <!-- Anel Fibroso e Fibras Radiais do Tímpano -->
+                <ellipse cx="340" cy="205" rx="7" ry="24" fill="none" stroke="#ffe4e6" stroke-width="1" opacity="0.7" />
+                <circle cx="342" cy="205" r="3" fill="#be123c" opacity="0.75" />
+                <text x="332" y="262" text-anchor="middle" fill="#be123c" font-size="12" font-weight="800">Tímpano</text>
+              </g>
+
+              <!-- Cadeia Ossicular Articulada (Martelo, Bigorna, Estribo) -->
+              <g id="ossicles-group" filter="url(#softShadow)">
+                <!-- 4. Martelo (Malleus - Cabo preso ao centro do tímpano e cabeça articulada) -->
+                <g id="malleus-bone" class="structure-group" data-id="martelo" onclick="selectStructure('martelo')">
+                  <path class="part-highlight" d="M 342 204 L 382 172 C 386 160, 404 158, 406 172 C 408 182, 396 188, 388 184 L 348 212 Z" fill="url(#boneOssicleGrad)" stroke="#334155" stroke-width="2.2" stroke-linejoin="round" />
+                  <text x="382" y="148" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Martelo</text>
+                </g>
+
+                <!-- 5. Bigorna (Incus - Corpo articulado com o martelo e ramo longo descendo) -->
+                <g id="incus-bone" class="structure-group" data-id="bigorna" onclick="selectStructure('bigorna')">
+                  <path class="part-highlight" d="M 404 166 C 424 156, 446 164, 446 180 C 446 194, 434 214, 432 224 L 420 220 C 422 204, 424 190, 405 182 Z" fill="url(#boneOssicleGrad)" stroke="#334155" stroke-width="2.2" stroke-linejoin="round" />
+                  <text x="442" y="148" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Bigorna</text>
+                </g>
+
+                <!-- 6. Estribo (Stapes - Arco anatômico com platina na Janela Oval) -->
+                <g id="stapes-piston-part" class="structure-group" data-id="estribo" onclick="selectStructure('estribo')">
+                  <path class="part-highlight" d="M 432 215 C 446 202, 466 200, 478 202 L 478 210 C 464 208, 448 210, 438 216 C 448 222, 464 224, 478 222 L 478 230 C 466 232, 446 230, 432 219 Z" fill="url(#boneOssicleGrad)" stroke="#1e293b" stroke-width="2" stroke-linejoin="round" />
+                  <!-- Platina do Estribo encaixada na Janela Oval -->
+                  <rect class="part-highlight" x="478" y="196" width="8" height="38" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2.2" />
+                  <text x="482" y="252" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Estribo</text>
+                </g>
+              </g>
+
+              <!-- 8. Canais Semicirculares & Vestíbulo (Labirinto Vestibular 3D) -->
+              <g class="structure-group" data-id="canais" onclick="selectStructure('canais')" filter="url(#softShadow)">
+                <!-- Canal Posterior -->
+                <path class="part-highlight" d="M 552 162 C 550 98, 616 90, 618 146 C 619 166, 602 180, 586 182" fill="none" stroke="url(#labyrinthTubeGrad)" stroke-width="11" stroke-linecap="round" />
+                <path d="M 554 156 C 554 104, 612 96, 614 144" fill="none" stroke="#e0e7ff" stroke-width="2.2" stroke-linecap="round" opacity="0.7" />
+                <!-- Canal Superior -->
+                <path class="part-highlight" d="M 518 175 C 492 118, 548 78, 576 122 C 588 140, 578 162, 565 170" fill="none" stroke="url(#labyrinthTubeGrad)" stroke-width="12" stroke-linecap="round" />
+                <path d="M 518 168 C 498 122, 546 86, 572 122" fill="none" stroke="#e0e7ff" stroke-width="2.4" stroke-linecap="round" opacity="0.75" />
+                <!-- Canal Lateral -->
+                <path class="part-highlight" d="M 532 182 C 512 154, 566 136, 594 166" fill="none" stroke="#818cf8" stroke-width="9" stroke-linecap="round" />
+                <!-- Vestíbulo e Ampolas -->
+                <ellipse cx="546" cy="194" rx="28" ry="22" fill="url(#labyrinthTubeGrad)" stroke="#312e81" stroke-width="2" />
+                <circle cx="520" cy="174" r="7" fill="#a5b4fc" stroke="#3730a3" stroke-width="1.5" />
+                <circle cx="556" cy="166" r="6.5" fill="#a5b4fc" stroke="#3730a3" stroke-width="1.5" />
+                <text x="568" y="84" text-anchor="middle" fill="#3730a3" font-size="12" font-weight="800">Canais Semicirculares</text>
+              </g>
+
+              <!-- 9. Cóclea (Caracol Ósseo em Espiral 3D com Onda Líquida e Ponto Tonotópico) -->
+              <g class="structure-group" data-id="coclea" onclick="selectStructure('coclea')" filter="url(#softShadow)">
+                <!-- Concha Externa da Cóclea -->
+                <path class="part-highlight" d="M 552 212 C 542 252, 566 296, 612 296 C 656 296, 678 256, 668 218 C 658 182, 618 172, 586 184 L 486 198 L 486 232 Z" fill="url(#cochleaShellGrad)" stroke="#1e1b4b" stroke-width="2.5" />
+                <!-- Espiral Interna de 2,5 Voltas -->
+                <path d="M 558 228 C 562 192, 616 180, 646 206 C 672 228, 658 274, 622 278 C 592 282, 578 256, 592 234 C 602 218, 628 220, 630 238 C 632 250, 616 256, 610 246" fill="none" stroke="#e0e7ff" stroke-width="5.5" stroke-linecap="round" />
+                <!-- Onda Hidráulica Propagando na Endolinfa -->
+                <path id="cochlea-fluid-wave" d="M 494 214 L 558 228 C 562 192, 616 180, 646 206 C 672 228, 658 274, 622 278 C 592 282, 578 256, 592 234 C 602 218, 628 220, 630 238" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
+                <!-- Halo e Ponto Tonotópico Ativo na Espiral Coclear -->
+                <circle id="cochlea-active-halo" cx="628" cy="226" r="13" fill="#facc15" opacity="0.45" />
+                <circle id="cochlea-active-spot" cx="628" cy="226" r="6.5" fill="#fef08a" stroke="#ca8a04" stroke-width="2.2" filter="url(#glowYellow)" />
+                <text x="612" y="318" text-anchor="middle" fill="#312e81" font-size="13" font-weight="800">Cóclea</text>
+              </g>
+
+              <!-- 10. Nervo Vestibulococlear & Córtex Auditivo Cerebral -->
+              <g class="structure-group" data-id="nervo" onclick="selectStructure('nervo')" filter="url(#softShadow)">
+                <!-- Silhueta Estilizada do Lobo Temporal (Cérebro) -->
+                <path d="M 758 136 C 782 118, 814 132, 816 168 C 818 202, 796 226, 768 222 C 756 220, 748 208, 750 192 C 744 172, 746 146, 758 136 Z" fill="url(#brainCortexGrad)" stroke="#be185d" stroke-width="2" />
+                <path d="M 768 152 Q 786 146 798 160 M 764 176 Q 784 170 796 184 M 768 198 Q 782 194 792 204" fill="none" stroke="#fdf2f8" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+
+                <!-- Feixes Nervosos (Ramo Vestibular + Ramo Coclear -> VIII Par) -->
+                <path class="part-highlight" d="M 610 162 C 655 166, 685 174, 764 166 L 768 196 C 705 206, 672 222, 646 238 L 636 214 C 662 200, 678 192, 688 188 C 666 182, 636 178, 608 174 Z" fill="url(#nerveGrad)" stroke="#a16207" stroke-width="2" stroke-linejoin="round" />
+
+                <!-- Impulsos Bioelétricos Animados -->
+                <path id="nerve-impulses" d="M 644 224 C 686 204, 722 190, 774 180" fill="none" stroke="#ef4444" stroke-width="3.2" stroke-linecap="round" filter="url(#glowYellow)" />
+                <path id="nerve-impulses-2" d="M 616 168 C 668 172, 718 176, 774 172" fill="none" stroke="#f97316" stroke-width="2.6" stroke-linecap="round" />
+
+                <text x="716" y="142" text-anchor="middle" fill="#854d0e" font-size="11.5" font-weight="800">Nervo Auditivo</text>
+                <text x="782" y="240" text-anchor="middle" fill="#9d174d" font-size="11" font-weight="800">Córtex Cerebral</text>
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Painel Detalhado da Estrutura Selecionada -->
+        <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+          <div class="flex items-center justify-between gap-2">
+            <span id="detail-zone-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">
+              Orelha Interna
+            </span>
+            <span class="text-xs font-semibold text-slate-400">Ficha Anatômica</span>
+          </div>
+
+          <div>
+            <h2 id="detail-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
+              Cóclea &amp; Órgão de Corti
+            </h2>
+            <p id="detail-subtitle" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
+              Caracol biológico que converte vibração em eletricidade
+            </p>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Conversão de Energia:</span>
+            <span id="detail-energy" class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+              Hidráulica → Elétrica
+            </span>
+          </div>
+
+          <div class="space-y-2">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Função Biológica</h3>
+            <p id="detail-description" class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+              Estrutura óssea em espiral (2,5 voltas) cheia de líquido. As ondas criadas pelo estribo fazem vibrar a Membrana Basilar. No Órgão de Corti, cerca de 16.000 células ciliadas dobram seus estereocílios e geram sinais bioelétricos.
+            </p>
+          </div>
+
+          <div class="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 space-y-1.5">
+            <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs uppercase tracking-wider">
+              <i class="fa-solid fa-lightbulb"></i>
+              <span>Curiosidade Científica</span>
+            </div>
+            <p id="detail-curiosity" class="text-xs sm:text-sm text-amber-950 dark:text-amber-100 leading-relaxed">
+              A cóclea funciona como um prisma sonoro: a base rígida detecta agudos (até 20 kHz) e o ápice flexível detecta graves (até 20 Hz).
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 2: LABORATÓRIO ACÚSTICO (HZ & DB) + IDADE AUDITIVA                -->
+    <!-- ===================================================================== -->
+    <section id="tab-acustica" class="hidden space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Controles de Frequência e Intensidade -->
+        <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                Gerador de Ondas Sonoras
+              </h2>
+              <p class="text-xs text-slate-500 dark:text-slate-400">
+                Ajuste a frequência (altura) e os decibéis (volume) em tempo real
+              </p>
+            </div>
+            <button id="btn-audio-toggle" type="button" onclick="toggleAudioEngine()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+              <i id="audio-icon" class="fa-solid fa-volume-high"></i>
+              <span id="audio-label">Ouvir Frequência</span>
+            </button>
+          </div>
+
+          <!-- Controle de Frequência -->
+          <div class="space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800">
+            <div class="flex items-center justify-between">
+              <label for="freq-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500">Frequência (Hertz)</label>
+              <span id="freq-display" class="text-base font-extrabold text-indigo-600 dark:text-indigo-400">440 Hz</span>
+            </div>
+            <input id="freq-slider" type="range" min="100" max="8000" step="10" value="440" oninput="updateAcousticParams()" class="w-full accent-indigo-600 cursor-pointer" />
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>100 Hz (Grave)</span>
+              <span id="freq-category" class="font-semibold text-slate-600 dark:text-slate-300">Médio / Voz Humana</span>
+              <span>8.000 Hz (Agudo)</span>
+            </div>
+          </div>
+
+          <!-- Controle de Intensidade -->
+          <div class="space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800">
+            <div class="flex items-center justify-between">
+              <label for="db-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500">Intensidade (Decibéis)</label>
+              <span id="db-display" class="text-base font-extrabold text-amber-600 dark:text-amber-400">65 dB</span>
+            </div>
+            <input id="db-slider" type="range" min="20" max="120" step="1" value="65" oninput="updateAcousticParams()" class="w-full accent-amber-500 cursor-pointer" />
+            <div class="flex justify-between items-center text-[11px] text-slate-400">
+              <span>20 dB (Sussurro)</span>
+              <span id="db-safety" class="text-xs font-semibold text-amber-600">Moderado</span>
+              <span>120 dB (Show / Turbina)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Osciloscópio & Mapa Tonotópico -->
+        <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
+          <div>
+            <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-500 mb-2">
+              Osciloscópio em Tempo Real
+            </h3>
+            <div class="w-full rounded-2xl bg-slate-950 p-3 border border-slate-800">
+              <canvas id="oscilloscope-canvas" class="w-full h-[150px] block"></canvas>
+            </div>
+          </div>
+
+          <!-- Tonotopia na Cóclea Desenrolada -->
+          <div class="space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tonotopia na Membrana Basilar</span>
+              <span id="tonotopy-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">Meio da Espiral (Médios)</span>
+            </div>
+
+            <div class="relative h-10 rounded-2xl bg-gradient-to-r from-rose-500 via-indigo-500 to-sky-500 p-1 flex items-center justify-between px-4 text-[11px] font-bold text-white shadow-inner">
+              <span>Base (Agudos)</span>
+              <span>Ápice (Graves)</span>
+              <div id="tonotopy-cursor" style="left: 55%;" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-4 border-slate-900 shadow-lg transition-all duration-200"></div>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Sons agudos vibram a entrada rígida da cóclea; sons graves viajam até a ponta flexível do caracol.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desafio da Idade Auditiva (8.000 Hz – 18.000 Hz) -->
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
+              Experimento Interativo com Visitantes
+            </span>
+            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
+              Desafio da “Idade Auditiva” (8.000 Hz → 18.000 Hz)
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              Inicie a varredura sonora e clique em <strong>“Parei de Ouvir!”</strong> assim que o apito agudo desaparecer para você.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-center">
+              <span class="block text-[10px] uppercase font-bold text-slate-400">Frequência Atual</span>
+              <span id="sweep-freq-display" class="text-lg font-extrabold text-purple-600 dark:text-purple-400">8.000 Hz</span>
+            </div>
+
+            <button id="btn-sweep-start" type="button" onclick="toggleSweepTest()" class="px-4 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+              <i class="fa-solid fa-play"></i>
+              <span>Iniciar Varredura</span>
+            </button>
+
+            <button id="btn-sweep-stop" type="button" onclick="stopSweepHere()" class="hidden px-4 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-extrabold shadow-md animate-bounce transition flex items-center gap-2">
+              <i class="fa-solid fa-hand"></i>
+              <span>Parei de Ouvir!</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
+          <div id="sweep-progress-bar" style="width: 0%;" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-150"></div>
+        </div>
+
+        <div id="sweep-result-box" class="hidden p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800">
+          <h4 id="sweep-result-title" class="font-extrabold text-sm sm:text-base text-purple-900 dark:text-purple-200"></h4>
+          <p id="sweep-result-desc" class="text-xs sm:text-sm text-purple-800 dark:text-purple-300 mt-1"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 3: SIMULADOR DE CONDIÇÕES AUDITIVAS                               -->
+    <!-- ===================================================================== -->
+    <section id="tab-condicoes" class="hidden space-y-5">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        <div class="lg:col-span-5 space-y-2.5" id="condition-cards"></div>
+
+        <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <span id="cond-type-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">
+                Referência Fisiológica
+              </span>
+              <h2 id="cond-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+                Audição Saudável (20 Hz – 20 kHz)
+              </h2>
+            </div>
+
+            <button id="btn-cond-audio" type="button" onclick="toggleConditionAudio()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+              <i class="fa-solid fa-headphones"></i>
+              <span>Ouvir Simulação Sonora</span>
+            </button>
+          </div>
+
+          <!-- Espectro Audível -->
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
+            <div class="flex justify-between text-xs font-bold text-slate-500">
+              <span>Espectro de Frequências Preservado</span>
+            </div>
+            <div class="w-full h-3.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+              <div id="cond-spectrum-bar" style="width: 100%;" class="h-full rounded-full bg-emerald-500 transition-all duration-500"></div>
+            </div>
+            <p id="cond-spectrum-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">
+              Espectro completo: graves, médios e agudos nítidos
+            </p>
+          </div>
+
+          <div class="space-y-3 text-sm">
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">O que acontece no ouvido?</h3>
+              <p id="cond-desc" class="text-slate-700 dark:text-slate-300 mt-1 leading-relaxed"></p>
+            </div>
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Impacto no dia a dia</h3>
+              <p id="cond-impact" class="text-slate-700 dark:text-slate-300 mt-1 leading-relaxed"></p>
+            </div>
+            <div class="p-3.5 rounded-2xl bg-sky-50 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-800/50">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">Cuidado &amp; Prevenção</h3>
+              <p id="cond-prevention" class="text-xs sm:text-sm text-sky-950 dark:text-sky-100 mt-1"></p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================================================================== -->
+    <!-- ABA 4: QUIZ CIENTÍFICO (5 ALEATÓRIAS DE UM BANCO DE 20 QUESTÕES)      -->
+    <!-- ===================================================================== -->
+    <section id="tab-quiz" class="hidden">
+      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div>
+            <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+              Desafio Científico — Teste seus Conhecimentos
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+              5 perguntas sorteadas aleatoriamente de um banco de 20 questões sobre o sistema auditivo.
+            </p>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <div class="px-3.5 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800 text-xs sm:text-sm font-extrabold text-indigo-700 dark:text-indigo-300">
+              Acertos: <span id="quiz-score">0</span> / <span id="quiz-total">5</span>
+            </div>
+
+            <button type="button" onclick="generateNewQuizRound(true)" class="px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-1.5">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Novas Perguntas</span>
+            </button>
+          </div>
+        </div>
+
+        <div id="quiz-container" class="space-y-4"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================================= -->
+  <!-- RODAPÉ DA PÁGINA                                                        -->
+  <!-- ======================================================================= -->
+  <footer class="mt-10 bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 pb-6 border-b border-slate-200/80 dark:border-slate-800">
+        <!-- Coluna 1: Identidade do Projeto e Autoras -->
+        <div class="space-y-3">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-sky-500 text-white flex items-center justify-center shadow-sm">
+              <i class="fa-solid fa-ear-listen text-sm"></i>
+            </div>
+            <div>
+              <h3 class="text-sm font-extrabold text-slate-900 dark:text-white">
+                Sistema Auditivo Humano
+              </h3>
+              <p class="text-[11px] font-medium text-indigo-600 dark:text-indigo-400">
+                Biologia &amp; Acústica Interativa
+              </p>
+            </div>
+          </div>
+          <p class="text-xs leading-relaxed text-slate-500 dark:text-slate-400">
+            Plataforma educacional desenvolvida para demonstrar a captação das ondas sonoras, a amplificação mecânica nos ossículos e a transdução bioelétrica na cóclea.
+          </p>
+          <div class="p-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 space-y-1">
+            <p class="text-xs font-extrabold text-indigo-900 dark:text-indigo-200 flex items-center gap-1.5">
+              <i class="fa-solid fa-user-graduate text-indigo-600 dark:text-indigo-400"></i>
+              <span>Alunas: Sarah, Alice e Vitória</span>
+            </p>
+            <p class="text-[11px] font-semibold text-indigo-700 dark:text-indigo-300">
+              6º Ano • Escola Teófilo Girão • 2026
+            </p>
+          </div>
+        </div>
+
+        <!-- Coluna 2: Navegação Rápida entre Módulos -->
+        <div class="space-y-2.5">
+          <h4 class="text-xs font-extrabold uppercase tracking-wider text-slate-900 dark:text-white">
+            Módulos da Apresentação
+          </h4>
+          <ul class="space-y-1.5 text-xs">
+            <li>
+              <button type="button" onclick="switchTab('anatomia'); window.scrollTo({ top: 0, behavior: 'smooth' });" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-2">
+                <i class="fa-solid fa-sitemap text-[11px] text-indigo-500"></i>
+                <span>1. Anatomia &amp; Transdução</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" onclick="switchTab('acustica'); window.scrollTo({ top: 0, behavior: 'smooth' });" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-2">
+                <i class="fa-solid fa-wave-square text-[11px] text-indigo-500"></i>
+                <span>2. Laboratório Acústico (Hz &amp; dB)</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" onclick="switchTab('condicoes'); window.scrollTo({ top: 0, behavior: 'smooth' });" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-2">
+                <i class="fa-solid fa-stethoscope text-[11px] text-indigo-500"></i>
+                <span>3. Simulador de Condições Auditivas</span>
+              </button>
+            </li>
+            <li>
+              <button type="button" onclick="switchTab('quiz'); window.scrollTo({ top: 0, behavior: 'smooth' });" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition flex items-center gap-2">
+                <i class="fa-solid fa-circle-question text-[11px] text-indigo-500"></i>
+                <span>4. Quiz Científico (Banco de 20 Questões)</span>
+              </button>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Coluna 3: Saúde Auditiva & Atalho -->
+        <div class="space-y-3">
+          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-1">
+            <div class="flex items-center gap-1.5 text-xs font-bold text-emerald-700 dark:text-emerald-400">
+              <i class="fa-solid fa-shield-heart"></i>
+              <span>Saúde Auditiva — Regra 60/60</span>
+            </div>
+            <p class="text-[11px] leading-relaxed text-slate-600 dark:text-slate-300">
+              Para proteger suas células ciliadas, ouça fones com volume abaixo de <strong>60%</strong> por no máximo <strong>60 minutos</strong> sem pausas.
+            </p>
+          </div>
+
+          <div class="flex justify-end">
+            <button type="button" onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5">
+              <i class="fa-solid fa-arrow-up"></i>
+              <span>Voltar ao Topo</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Barra Inferior -->
+      <div class="pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+        <p class="font-medium text-slate-600 dark:text-slate-300">
+          Projeto de Ciências • Feira Escolar
+        </p>
+        <p class="font-medium text-slate-400 dark:text-slate-500">
+          Faixa audível humana: 20 Hz a 20.000 Hz • Limite seguro: até 85 dB
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 1: ROTEIRO GUIADO DE APRESENTAÇÃO                                 -->
+  <!-- ======================================================================= -->
+  <div id="guide-modal" class="hidden fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-lg w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <span id="guide-step-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/60 dark:text-indigo-300">
+          Etapa 1 de 5
+        </span>
+        <button type="button" onclick="toggleGuideModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <h3 id="guide-title" class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white"></h3>
+
+      <div class="p-4 rounded-2xl bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60">
+        <p class="text-[11px] font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400 mb-1">Sugestão de Fala:</p>
+        <p id="guide-speech" class="text-sm italic text-slate-800 dark:text-slate-200 leading-relaxed"></p>
+      </div>
+
+      <div class="flex items-start gap-2.5 text-xs text-slate-600 dark:text-slate-400">
+        <i class="fa-solid fa-hand-point-right text-amber-500 mt-0.5"></i>
+        <p id="guide-tip"></p>
+      </div>
+
+      <div class="flex items-center justify-between pt-2">
+        <button id="btn-guide-prev" type="button" onclick="prevGuideStep()" class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 disabled:opacity-40">
+          <i class="fa-solid fa-arrow-left"></i> Anterior
+        </button>
+
+        <div id="guide-dots" class="flex items-center gap-1.5"></div>
+
+        <button id="btn-guide-next" type="button" onclick="nextGuideStep()" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-1.5">
+          <span>Próximo</span> <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================================= -->
+  <!-- MODAL 2: ZOOM MICROSCÓPICO NO ÓRGÃO DE CORTI                            -->
+  <!-- ======================================================================= -->
+  <div id="corti-modal" class="hidden fixed inset-0 z-40 bg-slate-950/65 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 max-w-2xl w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between gap-2">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">Visão Microscópica (Dentro da Cóclea)</span>
+          <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">Órgão de Corti &amp; Células Ciliadas</h3>
+        </div>
+        <button type="button" onclick="closeCortiModal()" class="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 flex items-center justify-center">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="flex flex-wrap gap-2">
+        <button id="btn-corti-healthy" type="button" onclick="setCortiState('healthy')" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm">
+          Células Saudáveis
+        </button>
+        <button id="btn-corti-damaged" type="button" onclick="setCortiState('damaged')" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+          Lesionadas por Som Alto (&gt;85 dB)
+        </button>
+      </div>
+
+      <div class="rounded-2xl bg-slate-950 p-4 border border-slate-800">
+        <svg id="corti-svg" viewBox="0 0 600 235" class="w-full h-auto block">
+          <defs>
+            <linearGradient id="tectoriaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#c7d2fe" stop-opacity="0.92" />
+              <stop offset="100%" stop-color="#6366f1" stop-opacity="0.78" />
+            </linearGradient>
+            <linearGradient id="hairCellBodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#7dd3fc" />
+              <stop offset="55%" stop-color="#0284c7" />
+              <stop offset="100%" stop-color="#0369a1" />
+            </linearGradient>
+            <linearGradient id="basilarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#818cf8" />
+              <stop offset="50%" stop-color="#4f46e5" />
+              <stop offset="100%" stop-color="#312e81" />
+            </linearGradient>
+          </defs>
+
+          <!-- Ondas da Endolinfa no Fundo -->
+          <path class="corti-fluid-line" d="M 30 28 Q 170 16 310 28 T 570 28" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="6 8" opacity="0.4" />
+          <path class="corti-fluid-line" d="M 30 104 Q 170 94 310 104 T 570 104" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="6 8" opacity="0.35" />
+
+          <!-- Membrana Tectória (Gelatinosa, posicionada logo acima dos estereocílios) -->
+          <path d="M 36 48 C 180 38, 380 42, 540 54 C 554 64, 548 84, 528 88 C 375 82, 180 80, 36 84 Z" fill="url(#tectoriaGrad)" stroke="#a5b4fc" stroke-width="1.5" />
+          <text x="175" y="33" fill="#c7d2fe" font-size="12" font-weight="700">Membrana Tectória (Gelatinosa)</text>
+
+          <!-- Células Ciliadas Esculpidas apoiadas sobre a Membrana Basilar -->
+          <g id="corti-cilia-group">
+            <!-- Célula 1 -->
+            <g class="corti-unit-1">
+              <g class="corti-hair-body transition-all duration-500">
+                <rect x="122" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
+                <circle cx="146" cy="156" r="10" fill="#0c4a6e" opacity="0.7" />
+              </g>
+              <g class="corti-cilia-anim" stroke="#fde047" stroke-width="3.2" stroke-linecap="round">
+                <line x1="134" y1="116" x2="134" y2="95" />
+                <line x1="142" y1="116" x2="142" y2="90" />
+                <line x1="150" y1="116" x2="150" y2="85" />
+                <line x1="158" y1="116" x2="158" y2="81" />
+              </g>
+            </g>
+            <!-- Célula 2 -->
+            <g class="corti-unit-2">
+              <g class="corti-hair-body transition-all duration-500">
+                <rect x="224" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
+                <circle cx="248" cy="156" r="10" fill="#0c4a6e" opacity="0.7" />
+              </g>
+              <g class="corti-cilia-anim" stroke="#fde047" stroke-width="3.2" stroke-linecap="round">
+                <line x1="236" y1="116" x2="236" y2="95" />
+                <line x1="244" y1="116" x2="244" y2="90" />
+                <line x1="252" y1="116" x2="252" y2="85" />
+                <line x1="260" y1="116" x2="260" y2="81" />
+              </g>
+            </g>
+            <!-- Célula 3 -->
+            <g class="corti-unit-3">
+              <g class="corti-hair-body transition-all duration-500">
+                <rect x="326" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
+                <circle cx="350" cy="156" r="10" fill="#0c4a6e" opacity="0.7" />
+              </g>
+              <g class="corti-cilia-anim" stroke="#fde047" stroke-width="3.2" stroke-linecap="round">
+                <line x1="338" y1="116" x2="338" y2="96" />
+                <line x1="346" y1="116" x2="346" y2="91" />
+                <line x1="354" y1="116" x2="354" y2="86" />
+                <line x1="362" y1="116" x2="362" y2="82" />
+              </g>
+            </g>
+            <!-- Célula 4 -->
+            <g class="corti-unit-4">
+              <g class="corti-hair-body transition-all duration-500">
+                <rect x="428" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
+                <circle cx="452" cy="156" r="10" fill="#0c4a6e" opacity="0.7" />
+              </g>
+              <g class="corti-cilia-anim" stroke="#fde047" stroke-width="3.2" stroke-linecap="round">
+                <line x1="440" y1="116" x2="440" y2="97" />
+                <line x1="448" y1="116" x2="448" y2="92" />
+                <line x1="456" y1="116" x2="456" y2="87" />
+                <line x1="464" y1="116" x2="464" y2="83" />
+              </g>
+            </g>
+          </g>
+
+          <!-- Membrana Basilar (Sincronizada com as células ciliadas) -->
+          <g class="corti-basilar-anim">
+            <rect x="36" y="182" width="528" height="14" rx="7" fill="url(#basilarGrad)" stroke="#a5b4fc" stroke-width="1" />
+          </g>
+
+          <!-- Sinapses e Impulsos Elétricos Animados para o Nervo Auditivo -->
+          <g id="corti-sparks" class="transition-opacity duration-500">
+            <path class="corti-spark-line" d="M 146 184 Q 210 208 290 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
+            <path class="corti-spark-line" d="M 248 184 Q 270 204 296 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
+            <path class="corti-spark-line" d="M 350 184 Q 330 204 304 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
+            <path class="corti-spark-line" d="M 452 184 Q 390 208 310 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
+            <circle cx="146" cy="184" r="4" fill="#fef08a" />
+            <circle cx="248" cy="184" r="4" fill="#fef08a" />
+            <circle cx="350" cy="184" r="4" fill="#fef08a" />
+            <circle cx="452" cy="184" r="4" fill="#fef08a" />
+          </g>
+
+          <text x="485" y="222" fill="#a5b4fc" font-size="11" font-weight="700">Membrana Basilar</text>
+          <text x="115" y="222" fill="#fde047" font-size="11" font-weight="700">Fibras do Nervo Auditivo →</text>
+        </svg>
+      </div>
+
+      <p id="corti-explanation" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></p>
+    </div>
+  </div>
+
+  <!-- Toast / Notificação Discreta (substitui alert) -->
+  <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
+    <div class="bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-3 text-xs sm:text-sm max-w-sm">
+      <i class="fa-solid fa-circle-info text-indigo-400 text-base"></i>
+      <span id="toast-msg">Mensagem</span>
+    </div>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 1. DADOS ANATÔMICOS DO SISTEMA AUDITIVO HUMANO
+    // =========================================================================
+    const STRUCTURES = {
+      pavilhao: {
+        id: 'pavilhao',
+        name: 'Pavilhão Auricular (Orelha)',
+        zone: 'Orelha Externa',
+        zoneColor: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
+        subtitle: 'Antena acústica natural que capta e localiza sons',
+        energy: 'Onda Sonora (Ar)',
+        tonotopyPos: 15,
+        description: 'Formado por cartilagem elástica revestida por pele, seu formato em concha com dobras (hélice e anti-hélice) capta as ondas sonoras do ambiente, direciona-as para o canal auditivo e ajuda o cérebro a identificar se o som vem de cima, de baixo ou de trás.',
+        curiosity: 'As dobras únicas da orelha humana alteram levemente o timbre do som conforme o ângulo de chegada, funcionando como uma impressão digital acústica.'
+      },
+      canal: {
+        id: 'canal',
+        name: 'Canal Auditivo Externo',
+        zone: 'Orelha Externa',
+        zoneColor: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
+        subtitle: 'Tubo ressonador de ~2,5 cm com proteção natural',
+        energy: 'Onda Sonora Amplificada',
+        tonotopyPos: 25,
+        description: 'Conduz as ondas sonoras do pavilhão até o tímpano. Por ter cerca de 2,5 cm de comprimento, funciona como um tubo ressonador que amplifica naturalmente frequências entre 2.000 Hz e 4.000 Hz (faixa essencial da fala humana).',
+        curiosity: 'As glândulas ceruminosas produzem cerúmen (cera), que lubrifica o canal, repele água e retém poeira e microrganismos.'
+      },
+      timpano: {
+        id: 'timpano',
+        name: 'Membrana Timpânica (Tímpano)',
+        zone: 'Orelha Externa → Média',
+        zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Película tensa e semitransparente que vibra com o som',
+        energy: 'Acústica → Mecânica',
+        tonotopyPos: 35,
+        description: 'Membrana cônica muito fina (~0,1 mm de espessura) que separa a orelha externa da média. Quando as variações de pressão do ar atingem sua superfície, ela vibra na mesma frequência da onda sonora.',
+        curiosity: 'Mesmo em sons muito suaves, o tímpano se desloca por distâncias menores que o diâmetro de um átomo de hidrogênio!'
+      },
+      martelo: {
+        id: 'martelo',
+        name: 'Martelo (Malleus)',
+        zone: 'Orelha Média',
+        zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Primeiro ossículo da cadeia de amplificação mecânica',
+        energy: 'Vibração Mecânica',
+        tonotopyPos: 45,
+        description: 'Seu cabo está diretamente inserido na face interna do tímpano. Ao receber as vibrações da membrana timpânica, atua como a primeira alavanca mecânica, transferindo o movimento para a bigorna.',
+        curiosity: 'Músculos minúsculos (como o tensor do tímpano) contraem-se diante de estrondos altos para proteger o ouvido interno — o chamado reflexo acústico.'
+      },
+      bigorna: {
+        id: 'bigorna',
+        name: 'Bigorna (Incus)',
+        zone: 'Orelha Média',
+        zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Ponte articulada entre o martelo e o estribo',
+        energy: 'Vibração Mecânica',
+        tonotopyPos: 52,
+        description: 'Ossículo intermediário articulado com a cabeça do martelo e com o estribo. Transmite e ajusta o braço de alavanca das vibrações mecânicas sem perda de fidelidade.',
+        curiosity: 'Os três ossículos já nascem praticamente com seu tamanho definitivo de adulto.'
+      },
+      estribo: {
+        id: 'estribo',
+        name: 'Estribo (Stapes)',
+        zone: 'Orelha Média → Interna',
+        zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Menor osso do corpo humano (~2,8 mm)',
+        energy: 'Mecânica → Hidráulica',
+        tonotopyPos: 60,
+        description: 'Sua base encaixa-se na Janela Oval da cóclea como um pistão. Como o tímpano é cerca de 17 vezes maior que a janela oval, a cadeia ossicular multiplica a pressão sonora em cerca de 22 vezes para vencer a resistência do líquido coclear.',
+        curiosity: 'Se o som atingisse o líquido da cóclea diretamente sem os ossículos, 99,9% da energia sonora seria refletida!'
+      },
+      tuba: {
+        id: 'tuba',
+        name: 'Tuba Auditiva (Trompa de Eustáquio)',
+        zone: 'Orelha Média',
+        zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Válvula de equalização de pressão atmosférica',
+        energy: 'Equilíbrio de Pressão',
+        tonotopyPos: 40,
+        description: 'Canal que liga a cavidade da orelha média à parte posterior do nariz (nasofaringe). Abre-se ao engolir ou bocejar, igualando a pressão do ar dos dois lados do tímpano.',
+        curiosity: 'É por causa da tuba auditiva que sentimos o ouvido "entupir" ao subir uma serra ou viajar de avião.'
+      },
+      canais: {
+        id: 'canais',
+        name: 'Canais Semicirculares (Labirinto)',
+        zone: 'Orelha Interna (Vestibular)',
+        zoneColor: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
+        subtitle: 'Giroscópio biológico responsável pelo equilíbrio',
+        energy: 'Aceleração Angular',
+        tonotopyPos: 70,
+        description: 'Três tubos dispostos em planos perpendiculares (X, Y e Z) preenchidos por endolinfa. Quando giramos a cabeça, a inércia do líquido desloca células sensoriais que informam ao cérebro nossa orientação espacial.',
+        curiosity: 'Embora fiquem na orelha interna junto à cóclea, não participam da audição — trabalham junto aos olhos para estabilizar o olhar.'
+      },
+      coclea: {
+        id: 'coclea',
+        name: 'Cóclea & Órgão de Corti',
+        zone: 'Orelha Interna',
+        zoneColor: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
+        subtitle: 'Caracol biológico que converte vibração em eletricidade',
+        energy: 'Hidráulica → Elétrica',
+        tonotopyPos: 82,
+        description: 'Estrutura óssea em espiral (2,5 voltas) cheia de líquido. As ondas criadas pelo estribo fazem vibrar a Membrana Basilar. No Órgão de Corti, cerca de 16.000 células ciliadas dobram seus estereocílios e geram sinais bioelétricos.',
+        curiosity: 'A cóclea funciona como um prisma sonoro: a base rígida detecta agudos (até 20 kHz) e o ápice flexível detecta graves (até 20 Hz).'
+      },
+      nervo: {
+        id: 'nervo',
+        name: 'Nervo Vestibulococlear (VIII Par)',
+        zone: 'Via Neural → Cérebro',
+        zoneColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300',
+        subtitle: 'Autoestrada de impulsos elétricos até o córtex auditivo',
+        energy: 'Impulso Bioelétrico',
+        tonotopyPos: 95,
+        description: 'Reúne milhares de fibras nervosas vindas da cóclea e do sistema vestibular, conduzindo potenciais de ação codificados em frequência e intensidade até o tronco encefálico e o lobo temporal do cérebro.',
+        curiosity: 'O cérebro compara diferenças de microssegundos entre a chegada do som na orelha esquerda e na direita para calcular a direção exata da fonte.'
+      }
+    };
+
+    // =========================================================================
+    // 2. ROTEIRO DE APRESENTAÇÃO GUIADA (5 ETAPAS)
+    // =========================================================================
+    const GUIDE_STEPS = [
+      {
+        structure: 'pavilhao',
+        title: '1. Captação: A Antena Acústica',
+        speech: '“A audição começa antes mesmo do som entrar na cabeça. O pavilhão auricular capta as ondas mecânicas do ar e o canal auditivo funciona como um tubo de ressonância que amplifica exatamente as frequências da voz humana.”',
+        tip: 'Aponte para a Orelha Externa no diagrama e mostre como as ondas entram no canal.'
+      },
+      {
+        structure: 'timpano',
+        title: '2. Transdução Mecânica no Tímpano',
+        speech: '“Ao final do canal, a onda de pressão atinge o tímpano — uma membrana finíssima que vibra em sincronia com o som, convertendo energia acústica do ar em movimento mecânico.”',
+        tip: 'Clique no Tímpano no diagrama para destacar a transição entre Orelha Externa e Média.'
+      },
+      {
+        structure: 'estribo',
+        title: '3. Amplificação pelos Menores Ossos do Corpo',
+        speech: '“Na orelha média, o martelo, a bigorna e o estribo — o menor osso do corpo humano — funcionam como um sistema de alavancas que multiplica a pressão sonora em cerca de 22 vezes para empurrar o líquido da orelha interna.”',
+        tip: 'Mencione também a Tuba Auditiva, que equilibra a pressão quando viajamos de avião.'
+      },
+      {
+        structure: 'coclea',
+        title: '4. A Mágica da Cóclea e Células Ciliadas',
+        speech: '“Dentro da cóclea, as ondas líquidas dobram microscópicas células ciliadas no Órgão de Corti. Cada região da espiral responde a uma altura de som: agudos na base e graves na ponta.”',
+        tip: 'Abra o botão “Ampliar Órgão de Corti” para impressionar a banca com o corte microscópico!'
+      },
+      {
+        structure: 'nervo',
+        title: '5. Do Impulso Elétrico à Consciência',
+        speech: '“Por fim, as células ciliadas disparam sinais bioelétricos pelo Nervo Vestibulococlear até o córtex auditivo no lobo temporal, onde o cérebro transforma eletricidade em música, fala e emoção.”',
+        tip: 'Convide os avaliadores a testarem o Microfone ao Vivo ou o Quiz de 20 questões!'
+      }
+    ];
+
+    // =========================================================================
+    // 3. SIMULADOR DE CONDIÇÕES AUDITIVAS
+    // =========================================================================
+    const CONDITIONS_DATA = {
+      normal: {
+        id: 'normal',
+        name: 'Audição Saudável (20 Hz – 20 kHz)',
+        badge: 'Referência Fisiológica',
+        badgeClass: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300',
+        filterType: 'allpass',
+        filterFreq: 12000,
+        gainMult: 1.0,
+        tinnitus: false,
+        spectrumWidth: '100%',
+        spectrumColor: 'bg-emerald-500',
+        spectrumLabel: 'Espectro completo: graves, médios e agudos nítidos',
+        desc: 'Todas as estruturas conduzem a vibração sem bloqueios e as 16.000 células ciliadas da cóclea enviam sinais precisos ao cérebro.',
+        impact: 'Compreensão clara da fala mesmo em ambientes com ruído moderado.',
+        prevention: 'Mantenha o volume dos fones abaixo de 60% e faça pausas a cada 60 minutos.'
+      },
+      otite: {
+        id: 'otite',
+        name: 'Otite / Excesso de Cera (Perda Condutiva)',
+        badge: 'Bloqueio Mecânico',
+        badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        filterType: 'lowpass',
+        filterFreq: 420,
+        gainMult: 0.45,
+        tinnitus: false,
+        spectrumWidth: '45%',
+        spectrumColor: 'bg-amber-500',
+        spectrumLabel: 'Som abafado: atenuação geral de volume e perda de brilho',
+        desc: 'Acúmulo de cerúmen no canal ou secreção inflamatória na orelha média dificultam a vibração livre do tímpano e dos ossículos.',
+        impact: 'Sensação de ouvido tampado, voz própria ecoando e necessidade de aumentar o volume da TV.',
+        prevention: 'Nunca introduza hastes flexíveis (cotonetes) no canal auditivo — isso empurra a cera contra o tímpano.'
+      },
+      fone: {
+        id: 'fone',
+        name: 'Lesão por Ruído / Fone Alto (Neurossensorial)',
+        badge: 'Dano nas Células Ciliadas',
+        badgeClass: 'bg-rose-100 text-rose-800 dark:bg-rose-900/50 dark:text-rose-300',
+        filterType: 'lowpass',
+        filterFreq: 1350,
+        gainMult: 0.78,
+        tinnitus: false,
+        spectrumWidth: '62%',
+        spectrumColor: 'bg-rose-500',
+        spectrumLabel: 'Perda de agudos: consoantes (S, F, T, P) ficam difíceis de distinguir',
+        desc: 'A exposição repetida acima de 85 dB destrói irreversivelmente as células ciliadas da base da cóclea, responsáveis pelos sons agudos.',
+        impact: 'A pessoa ouve que alguém está falando, mas não entende as palavras com clareza (“ouço, mas não entendo”).',
+        prevention: 'Use protetores auriculares em shows/obras e prefira fones com cancelamento de ruído para não precisar subir o volume.'
+      },
+      tinnitus: {
+        id: 'tinnitus',
+        name: 'Zumbido Auditivo (Tinnitus)',
+        badge: 'Atividade Neural Fantasma',
+        badgeClass: 'bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300',
+        filterType: 'allpass',
+        filterFreq: 8000,
+        gainMult: 0.85,
+        tinnitus: true,
+        spectrumWidth: '78%',
+        spectrumColor: 'bg-purple-500',
+        spectrumLabel: 'Apito contínuo agudo (~4.500 Hz) sobreposto aos sons reais',
+        desc: 'Quando células ciliadas sofrem estresse ou lesão, fibras do nervo auditivo passam a disparar impulsos elétricos espontâneos mesmo no silêncio absoluto.',
+        impact: 'Percepção constante de apito, chiado ou cigarra que dificulta a concentração e o sono.',
+        prevention: 'Evite exposição súbita a explosões/caixas de som e procure um otorrinolaringologista se o apito durar mais de 24h.'
+      },
+      implante: {
+        id: 'implante',
+        name: 'Implante Coclear (Ouvido Biônico)',
+        badge: 'Neuroprótese Eletrônica',
+        badgeClass: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
+        filterType: 'bandpass',
+        filterFreq: 1800,
+        gainMult: 0.95,
+        tinnitus: false,
+        spectrumWidth: '70%',
+        spectrumColor: 'bg-indigo-500',
+        spectrumLabel: 'Sinal sintetizado: eletrodos estimulam diretamente o nervo auditivo',
+        desc: 'Indicado para surdez severa ou profunda. Um microfone externo capta o som, um processador converte em pulsos digitais e eletrodos dentro da cóclea estimulam diretamente o nervo auditivo.',
+        impact: 'Permite perceber fala e sons ambientais com timbre mais metálico/eletrônico até o cérebro se adaptar.',
+        prevention: 'Exemplo extraordinário da bioengenharia substituindo a função das células ciliadas danificadas.'
+      }
+    };
+
+    // =========================================================================
+    // 4. BANCO EXPANDIDO DE PERGUNTAS DO QUIZ CIENTÍFICO (20 QUESTÕES)
+    // =========================================================================
+    const QUIZ_POOL = [
+      {
+        q: 'Qual é a sequência correta dos três ossículos da orelha média, de fora para dentro?',
+        options: [
+          'Estribo → Bigorna → Martelo',
+          'Martelo → Bigorna → Estribo',
+          'Bigorna → Martelo → Cóclea',
+          'Tímpano → Cóclea → Estribo'
+        ],
+        answer: 1,
+        explanation: 'O martelo encosta no tímpano, transmite a vibração à bigorna e esta aciona o estribo na janela oval.'
+      },
+      {
+        q: 'Qual estrutura da orelha interna converte vibrações mecânicas em impulsos elétricos?',
+        options: [
+          'Tuba Auditiva',
+          'Canais Semicirculares',
+          'Cóclea (Órgão de Corti)',
+          'Pavilhão Auricular'
+        ],
+        answer: 2,
+        explanation: 'As células ciliadas dentro da cóclea realizam a transdução mecanoelétrica.'
+      },
+      {
+        q: 'Qual é a principal função dos Canais Semicirculares?',
+        options: [
+          'Amplificar sons graves',
+          'Produzir cerúmen protetor',
+          'Equalizar a pressão com a garganta',
+          'Manter o equilíbrio e perceber movimentos da cabeça'
+        ],
+        answer: 3,
+        explanation: 'Os canais semicirculares formam o sistema vestibular responsável pelo equilíbrio espacial.'
+      },
+      {
+        q: 'Por que sentimos alívio ao bocejar durante a decolagem ou pouso de um avião?',
+        options: [
+          'Porque o tímpano para de vibrar',
+          'Porque a tuba auditiva se abre e iguala a pressão do ar na orelha média',
+          'Porque a cóclea absorve o excesso de ar',
+          'Porque os ossículos se desconectam temporariamente'
+        ],
+        answer: 1,
+        explanation: 'A tuba auditiva conecta a orelha média à nasofaringe, equalizando a pressão atmosférica.'
+      },
+      {
+        q: 'Na organização tonotópica da cóclea, onde são detectados os sons mais agudos (altas frequências)?',
+        options: [
+          'Na base da cóclea (próximo à janela oval)',
+          'No ápice (ponta interna do caracol)',
+          'Apenas no pavilhão auricular',
+          'Na tuba auditiva'
+        ],
+        answer: 0,
+        explanation: 'A base da membrana basilar é mais estreita e rígida, ressoando com altas frequências (sons agudos).'
+      },
+      {
+        q: 'Qual é a faixa padrão de frequências sonoras audíveis por um ser humano jovem e saudável?',
+        options: [
+          '1 Hz a 500 Hz',
+          '20 Hz a 20.000 Hz',
+          '100 Hz a 5.000 Hz',
+          '20.000 Hz a 100.000 Hz'
+        ],
+        answer: 1,
+        explanation: 'O ouvido humano capta ondas entre 20 Hz (graves profundos) e 20.000 Hz (agudos extremos).'
+      },
+      {
+        q: 'Qual é considerado o menor osso de todo o corpo humano?',
+        options: [
+          'Martelo',
+          'Bigorna',
+          'Estribo',
+          'Falange distal'
+        ],
+        answer: 2,
+        explanation: 'O estribo mede cerca de 2,5 a 3 milímetros, sendo menor que um grão de arroz.'
+      },
+      {
+        q: 'Qual é a principal função biológica do cerúmen (cera) produzido no canal auditivo?',
+        options: [
+          'Bloquear completamente ondas agudas',
+          'Lubrificar e proteger contra poeira, bactérias e insetos',
+          'Transmitir impulsos elétricos ao cérebro',
+          'Conectar o tímpano à cóclea'
+        ],
+        answer: 1,
+        explanation: 'A cera atua como barreira antimicrobiana e retém partículas antes que atinjam o tímpano.'
+      },
+      {
+        q: 'Qual nervo craniano transporta os sinais auditivos e de equilíbrio até o cérebro?',
+        options: [
+          'Nervo Óptico (II par)',
+          'Nervo Vago (X par)',
+          'Nervo Vestibulococlear (VIII par)',
+          'Nervo Trigêmeo (V par)'
+        ],
+        answer: 2,
+        explanation: 'O VIII par craniano (vestibulococlear) reúne fibras da cóclea e do sistema vestibular.'
+      },
+      {
+        q: 'O que acontece quando células ciliadas humanas são destruídas por exposição a sons muito altos?',
+        options: [
+          'Elas crescem novamente em 48 horas',
+          'Não se regeneram, causando perda auditiva permanente',
+          'São substituídas por tecido ósseo',
+          'Passam a captar apenas ultrassons'
+        ],
+        answer: 1,
+        explanation: 'Em mamíferos, as células ciliadas cocleares não se regeneram após serem lesionadas.'
+      },
+      {
+        q: 'Em quanto a cadeia de ossículos (martelo, bigorna e estribo) amplifica a pressão sonora até a janela oval?',
+        options: [
+          'Cerca de 2 vezes',
+          'Cerca de 20 a 22 vezes',
+          'Cerca de 500 vezes',
+          'Não amplifica, apenas reduz o som'
+        ],
+        answer: 1,
+        explanation: 'A diferença de área entre o tímpano e a janela oval somada ao efeito de alavanca multiplica a pressão em ~22x.'
+      },
+      {
+        q: 'Qual região da cóclea vibra com maior intensidade diante de sons graves (baixas frequências)?',
+        options: [
+          'O ápice (ponta interna da espiral)',
+          'A base (entrada da cóclea)',
+          'A membrana timpânica',
+          'A tuba auditiva'
+        ],
+        answer: 0,
+        explanation: 'No ápice da cóclea, a membrana basilar é mais larga e flexível, ressoando com baixas frequências.'
+      },
+      {
+        q: 'A partir de qual nível de intensidade sonora (em decibéis) começa o risco de lesão auditiva por exposição prolongada?',
+        options: [
+          '30 dB',
+          '55 dB',
+          '85 dB',
+          '140 dB'
+        ],
+        answer: 2,
+        explanation: 'Acima de 85 dB (trânsito pesado ou fones altos), o limite seguro cai rapidamente com o tempo.'
+      },
+      {
+        q: 'O que recomenda a “Regra 60/60” para o uso saudável de fones de ouvido?',
+        options: [
+          'Usar por 60 horas a 60 Hz',
+          'Manter o volume abaixo de 60% e fazer pausas a cada 60 minutos',
+          'Ouvir apenas músicas de 60 batidas por minuto',
+          'Trocar de fone a cada 60 dias'
+        ],
+        answer: 1,
+        explanation: 'Limitar o volume a 60% e descansar os ouvidos a cada 60 minutos previne fadiga e morte das células ciliadas.'
+      },
+      {
+        q: 'Como se chama a perda gradual da audição para sons agudos relacionada ao envelhecimento natural?',
+        options: [
+          'Miopia acústica',
+          'Presbiacusia',
+          'Labirintite aguda',
+          'Otosclerose infantil'
+        ],
+        answer: 1,
+        explanation: 'A presbiacusia ocorre pelo desgaste natural das células ciliadas da base da cóclea ao longo dos anos.'
+      },
+      {
+        q: 'Qual estrutura gelatinosa do Órgão de Corti roça nos estereocílios para desencadear o impulso elétrico?',
+        options: [
+          'Membrana Tectória',
+          'Janela Redonda',
+          'Pavilhão Auricular',
+          'Córtex Visual'
+        ],
+        answer: 0,
+        explanation: 'O movimento entre a membrana basilar e a membrana tectória dobra os cílios e abre canais de potássio.'
+      },
+      {
+        q: 'Por que nossa própria voz parece diferente quando a ouvimos em uma gravação?',
+        options: [
+          'Porque microfones só captam frequências agudas',
+          'Porque ao falar ouvimos também pela condução óssea do crânio, que realça os graves',
+          'Porque o tímpano desliga enquanto falamos',
+          'Porque a cóclea inverte o timbre da voz'
+        ],
+        answer: 1,
+        explanation: 'Na gravação ouvimos apenas a condução aérea, sem a ressonância grave dos ossos do crânio.'
+      },
+      {
+        q: 'Como um Implante Coclear permite que pessoas com surdez profunda voltem a perceber sons?',
+        options: [
+          'Aumentando o tamanho do pavilhão auricular',
+          'Estimulando diretamente o nervo auditivo com pulsos elétricos',
+          'Substituindo o tímpano por uma placa de vidro',
+          'Limpando o líquido dos canais semicirculares'
+        ],
+        answer: 1,
+        explanation: 'O implante contorna as células ciliadas danificadas e envia sinais elétricos direto às fibras do nervo auditivo.'
+      },
+      {
+        q: 'Em qual região do cérebro humano ocorre a interpretação consciente das palavras e músicas?',
+        options: [
+          'Lobo Occipital',
+          'Cerebelo',
+          'Córtex Auditivo (Lobo Temporal)',
+          'Bulbo Raquidiano'
+        ],
+        answer: 2,
+        explanation: 'O córtex auditivo primário localiza-se no lobo temporal do cérebro.'
+      },
+      {
+        q: 'Qual é a principal causa de perda auditiva do tipo condutiva (som abafado)?',
+        options: [
+          'Bloqueio mecânico no canal auditivo ou líquido na orelha média (otite)',
+          'Lesão no lobo temporal do cérebro',
+          'Excesso de potássio na endolinfa',
+          'Ruptura do nervo óptico'
+        ],
+        answer: 0,
+        explanation: 'Na perda condutiva, o som encontra uma barreira física (como cera ou secreção de otite) antes de chegar à cóclea.'
+      }
+    ];
+    const QUIZ_ROUND_SIZE = 5;
+
+    // =========================================================================
+    // 5. ESTADO GLOBAL DA APLICAÇÃO
+    // =========================================================================
+    let selectedStructureId = 'coclea';
+    let currentGuideStep = 0;
+    let isWaveAnimating = true;
+
+    // Estado de Áudio & Microfone
+    let audioCtx = null;
+    let oscillator = null;
+    let gainNode = null;
+    let isAudioPlaying = false;
+
+    let micStream = null;
+    let micAnalyser = null;
+    let micDataArray = null;
+    let micTimeArray = null;
+    let isMicActive = false;
+    let micAnimationId = null;
+    let micWavePhase = 0;
+
+    // Estado da Varredura de Idade Auditiva
+    let isSweepRunning = false;
+    let sweepFreq = 8000;
+    let sweepOsc = null;
+    let sweepGain = null;
+    let sweepInterval = null;
+
+    // Estado do Simulador de Condições Auditivas
+    let currentConditionId = 'normal';
+    let condAudioPlaying = false;
+    let condOsc = null;
+    let condFilter = null;
+    let condGain = null;
+    let condTinnitusOsc = null;
+
+    // Pontos ao longo da espiral da Cóclea (Base -> Ápice) para visualização tonotópica
+    const COCHLEA_SPIRAL_POINTS = [
+      { x: 564, y: 224 }, // Base (Agudos extremos)
+      { x: 582, y: 198 },
+      { x: 618, y: 194 },
+      { x: 648, y: 212 },
+      { x: 656, y: 244 },
+      { x: 636, y: 272 },
+      { x: 602, y: 274 },
+      { x: 586, y: 248 },
+      { x: 600, y: 224 },
+      { x: 626, y: 228 },
+      { x: 624, y: 248 },
+      { x: 610, y: 244 }  // Ápice (Graves profundos)
+    ];
+    let oscCanvas = null;
+    let oscCtx = null;
+    let oscPhase = 0;
+
+    // Estado do Quiz
+    let activeQuizQuestions = [];
+    let userAnswers = new Array(QUIZ_ROUND_SIZE).fill(null);
+
+    // =========================================================================
+    // 6. INICIALIZAÇÃO
+    // =========================================================================
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        renderStructurePills();
+        selectStructure('coclea');
+        renderConditionCards();
+        selectCondition('normal');
+        generateNewQuizRound(false);
+        initOscilloscope();
+        updateAcousticParams();
+      } catch (err) {
+        console.error('Erro na inicialização:', err);
+      }
+    });
+
+    // =========================================================================
+    // 7. NAVEGAÇÃO ENTRE ABAS & NOTIFICAÇÕES
+    // =========================================================================
+    function switchTab(tabName) {
+      const tabs = ['anatomia', 'acustica', 'condicoes', 'quiz'];
+      tabs.forEach(t => {
+        const panel = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab-btn-${t}`);
+        if (!panel || !btn) return;
+
+        if (t === tabName) {
+          panel.classList.remove('hidden');
+          btn.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition flex items-center gap-2 whitespace-nowrap';
+        } else {
+          panel.classList.add('hidden');
+          btn.className = 'px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition flex items-center gap-2 whitespace-nowrap';
+        }
+      });
+
+      if (tabName === 'acustica') {
+        resizeOscilloscope();
+      }
+    }
+
+    function showToast(msg) {
+      const box = document.getElementById('toast-box');
+      const label = document.getElementById('toast-msg');
+      if (!box || !label) return;
+      label.textContent = msg;
+      box.classList.remove('hidden', 'translate-y-4', 'opacity-0');
+      clearTimeout(window._toastTimer);
+      window._toastTimer = setTimeout(() => {
+        box.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => box.classList.add('hidden'), 300);
+      }, 3200);
+    }
+
+    // =========================================================================
+    // 8. DIAGRAMA ANATÔMICO & DETALHES
+    // =========================================================================
+    function renderStructurePills() {
+      const container = document.getElementById('structure-pills');
+      if (!container) return;
+      container.innerHTML = '';
+
+      Object.values(STRUCTURES).forEach(st => {
+        const btn = document.createElement('button');
+        btn.id = `pill-${st.id}`;
+        btn.type = 'button';
+        btn.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold border transition border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-400';
+        btn.textContent = st.name.split(' (')[0];
+        btn.onclick = () => selectStructure(st.id);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectStructure(id) {
+      const st = STRUCTURES[id];
+      if (!st) return;
+      selectedStructureId = id;
+
+      Object.keys(STRUCTURES).forEach(key => {
+        const pill = document.getElementById(`pill-${key}`);
+        if (!pill) return;
+        if (key === id) {
+          pill.className = 'px-3 py-1.5 rounded-xl text-xs font-bold border transition border-indigo-600 bg-indigo-600 text-white shadow-sm';
+        } else {
+          pill.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold border transition border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:border-indigo-400';
+        }
+      });
+
+      document.querySelectorAll('.structure-group').forEach(el => {
+        if (el.getAttribute('data-id') === id) {
+          el.classList.add('active-part');
+        } else {
+          el.classList.remove('active-part');
+        }
+      });
+
+      const badge = document.getElementById('detail-zone-badge');
+      if (badge) {
+        badge.textContent = st.zone;
+        badge.className = `inline-block px-2.5 py-1 rounded-lg text-xs font-bold ${st.zoneColor}`;
+      }
+      const titleEl = document.getElementById('detail-title');
+      if (titleEl) titleEl.textContent = st.name;
+
+      const subEl = document.getElementById('detail-subtitle');
+      if (subEl) subEl.textContent = st.subtitle;
+
+      const energyEl = document.getElementById('detail-energy');
+      if (energyEl) energyEl.textContent = st.energy;
+
+      const descEl = document.getElementById('detail-description');
+      if (descEl) descEl.textContent = st.description;
+
+      const curEl = document.getElementById('detail-curiosity');
+      if (curEl) curEl.textContent = st.curiosity;
+    }
+
+    function toggleWaveAnimation() {
+      isWaveAnimating = !isWaveAnimating;
+      const waves = document.getElementById('sound-waves');
+      const tymp = document.getElementById('tympanum-membrane');
+      const oss = document.getElementById('ossicles-group');
+      const stapes = document.getElementById('stapes-piston-part');
+      const fluid = document.getElementById('cochlea-fluid-wave');
+      const impulses = document.getElementById('nerve-impulses');
+      const impulses2 = document.getElementById('nerve-impulses-2');
+      const icon = document.getElementById('wave-icon');
+      const label = document.getElementById('wave-label');
+
+      [waves, tymp, oss, stapes, fluid, impulses, impulses2].forEach(el => {
+        if (!el) return;
+        el.style.animationPlayState = isWaveAnimating ? 'running' : 'paused';
+      });
+
+      if (icon && label) {
+        icon.className = isWaveAnimating ? 'fa-solid fa-pause' : 'fa-solid fa-play';
+        label.textContent = isWaveAnimating ? 'Pausar Ondas' : 'Retomar Ondas';
+      }
+    }
+
+    // =========================================================================
+    // 9. ROTEIRO GUIADO DE APRESENTAÇÃO
+    // =========================================================================
+    function toggleGuideModal() {
+      const modal = document.getElementById('guide-modal');
+      if (!modal) return;
+      const isHidden = modal.classList.contains('hidden');
+      if (isHidden) {
+        modal.classList.remove('hidden');
+        switchTab('anatomia');
+        renderGuideStep();
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+    function renderGuideStep() {
+      const step = GUIDE_STEPS[currentGuideStep];
+      if (!step) return;
+
+      selectStructure(step.structure);
+
+      const badge = document.getElementById('guide-step-badge');
+      const title = document.getElementById('guide-title');
+      const speech = document.getElementById('guide-speech');
+      const tip = document.getElementById('guide-tip');
+      const dots = document.getElementById('guide-dots');
+      const btnPrev = document.getElementById('btn-guide-prev');
+      const btnNext = document.getElementById('btn-guide-next');
+
+      if (badge) badge.textContent = `Etapa ${currentGuideStep + 1} de ${GUIDE_STEPS.length}`;
+      if (title) title.textContent = step.title;
+      if (speech) speech.textContent = step.speech;
+      if (tip) tip.textContent = step.tip;
+
+      if (dots) {
+        dots.innerHTML = GUIDE_STEPS.map((_, idx) =>
+          `<span class="w-2 h-2 rounded-full ${idx === currentGuideStep ? 'bg-indigo-600 w-5' : 'bg-slate-300 dark:bg-slate-700'} transition-all"></span>`
+        ).join('');
+      }
+
+      if (btnPrev) btnPrev.disabled = currentGuideStep === 0;
+      if (btnNext) {
+        btnNext.innerHTML = currentGuideStep === GUIDE_STEPS.length - 1
+          ? '<span>Concluir</span> <i class="fa-solid fa-check"></i>'
+          : '<span>Próximo</span> <i class="fa-solid fa-arrow-right"></i>';
+      }
+    }
+
+    function prevGuideStep() {
+      if (currentGuideStep > 0) {
+        currentGuideStep--;
+        renderGuideStep();
+      }
+    }
+
+    function nextGuideStep() {
+      if (currentGuideStep < GUIDE_STEPS.length - 1) {
+        currentGuideStep++;
+        renderGuideStep();
+      } else {
+        toggleGuideModal();
+        showToast('Roteiro concluído! Agora convide os visitantes para o Quiz.');
+      }
+    }
+
+    // =========================================================================
+    // 10. ZOOM MICROSCÓPICO NO ÓRGÃO DE CORTI
+    // =========================================================================
+    function openCortiModal() {
+      const modal = document.getElementById('corti-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        setCortiState('healthy');
+      }
+    }
+
+    function closeCortiModal() {
+      const modal = document.getElementById('corti-modal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function setCortiState(state) {
+      const btnHealthy = document.getElementById('btn-corti-healthy');
+      const btnDamaged = document.getElementById('btn-corti-damaged');
+      const cortiSvg = document.getElementById('corti-svg');
+      const sparks = document.getElementById('corti-sparks');
+      const exp = document.getElementById('corti-explanation');
+
+      if (state === 'healthy') {
+        if (btnHealthy) btnHealthy.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow-sm';
+        if (btnDamaged) btnDamaged.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+        if (cortiSvg) cortiSvg.classList.remove('corti-damaged');
+        if (sparks) sparks.style.opacity = '1';
+        if (exp) {
+          exp.innerHTML = '<strong>Células Ciliadas Saudáveis:</strong> Quando a onda líquida eleva a Membrana Basilar, os estereocílios tocam a Membrana Tectória, inclinam-se e abrem canais iônicos que disparam impulsos elétricos ao nervo auditivo.';
+        }
+      } else {
+        if (btnDamaged) btnDamaged.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white shadow-sm';
+        if (btnHealthy) btnHealthy.className = 'px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300';
+        if (cortiSvg) cortiSvg.classList.add('corti-damaged');
+        if (sparks) sparks.style.opacity = '0.08';
+        if (exp) {
+          exp.innerHTML = '<strong class="text-rose-600 dark:text-rose-400">Células Lesionadas por Ruído Alto (&gt;85 dB):</strong> Os cílios ficam quebrados ou fundidos. Como mamíferos não regeneram essas células, o sinal elétrico deixa de ser enviado ao cérebro (perda auditiva permanente).';
+        }
+      }
+    }
+
+    // =========================================================================
+    // 11. MICROFONE AO VIVO (ANÁLISE EM TEMPO REAL)
+    // =========================================================================
+    async function toggleMicInput() {
+      const btn = document.getElementById('btn-mic');
+      const label = document.getElementById('mic-label');
+      const liveBadge = document.getElementById('mic-live-badge');
+      const earSvg = document.getElementById('ear-svg');
+
+      if (isMicActive) {
+        isMicActive = false;
+        if (micAnimationId) cancelAnimationFrame(micAnimationId);
+        if (micStream) {
+          micStream.getTracks().forEach(track => track.stop());
+          micStream = null;
+        }
+        if (earSvg) earSvg.classList.remove('mic-driven');
+
+        // Restaura estilos inline para que a animação CSS volte suavemente
+        const tymp = document.getElementById('tympanum-membrane');
+        const oss = document.getElementById('ossicles-group');
+        const stapes = document.getElementById('stapes-piston-part');
+        const waves = document.getElementById('sound-waves');
+        if (tymp) tymp.style.transform = '';
+        if (oss) oss.style.transform = '';
+        if (stapes) stapes.style.transform = '';
+        if (waves) {
+          waves.style.transform = '';
+          waves.style.opacity = '';
+          waves.style.strokeWidth = '';
+        }
+
+        if (btn) btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/60 transition flex items-center gap-1.5';
+        if (label) label.textContent = 'Mic ao Vivo';
+        if (liveBadge) liveBadge.classList.add('hidden');
+        updateAcousticParams(false);
+        showToast('Microfone desativado.');
+        return;
+      }
+
+      try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          showToast('Seu navegador não suporta captura de microfone neste ambiente.');
+          return;
+        }
+
+        stopMainAudio();
+        stopSweepAudio();
+        stopConditionAudio();
+
+        micStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          }
+        });
+
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const source = audioCtx.createMediaStreamSource(micStream);
+        micAnalyser = audioCtx.createAnalyser();
+        micAnalyser.fftSize = 512;
+        micAnalyser.smoothingTimeConstant = 0.6;
+        source.connect(micAnalyser);
+
+        micDataArray = new Uint8Array(micAnalyser.frequencyBinCount);
+        micTimeArray = new Uint8Array(micAnalyser.fftSize);
+        isMicActive = true;
+
+        if (earSvg) earSvg.classList.add('mic-driven');
+        if (btn) btn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 text-white shadow-md animate-pulse transition flex items-center gap-1.5';
+        if (label) label.textContent = 'Ouvindo Ambiente...';
+        if (liveBadge) liveBadge.classList.remove('hidden');
+
+        showToast('Microfone ativo! Fale, assovie ou bata palmas para ver o ouvido reagir.');
+        processMicLoop();
+      } catch (err) {
+        console.warn('Permissão de microfone negada ou indisponível:', err);
+        showToast('Não foi possível acessar o microfone. Verifique as permissões do navegador.');
+      }
+    }
+
+    function processMicLoop() {
+      if (!isMicActive || !micAnalyser) return;
+
+      micAnalyser.getByteTimeDomainData(micTimeArray);
+      micAnalyser.getByteFrequencyData(micDataArray);
+
+      // Calcula amplitude instantânea (RMS) para reação imediata a voz e palmas
+      let sumSquares = 0;
+      for (let i = 0; i < micTimeArray.length; i++) {
+        const norm = (micTimeArray[i] - 128) / 128;
+        sumSquares += norm * norm;
+      }
+      const rms = Math.sqrt(sumSquares / micTimeArray.length);
+      // Amplifica sensibilidade para captar fala normal com clareza
+      const level = Math.min(1, rms * 5.2);
+
+      // Encontra frequência dominante
+      let maxVal = 0;
+      let maxIdx = 1;
+      for (let i = 2; i < micDataArray.length; i++) {
+        if (micDataArray[i] > maxVal) {
+          maxVal = micDataArray[i];
+          maxIdx = i;
+        }
+      }
+
+      const tymp = document.getElementById('tympanum-membrane');
+      const oss = document.getElementById('ossicles-group');
+      const stapes = document.getElementById('stapes-piston-part');
+      const waves = document.getElementById('sound-waves');
+      const statusText = document.getElementById('model-status-text');
+      const statusDot = document.getElementById('model-status-dot');
+
+      // Animação direta das ondas sonoras no canal auditivo
+      micWavePhase += 0.12 + level * 0.45;
+      if (waves) {
+        const waveX = Math.sin(micWavePhase) * (6 + level * 16);
+        waves.style.transform = `translateX(${waveX.toFixed(1)}px)`;
+        waves.style.opacity = (0.15 + level * 0.85).toFixed(2);
+        waves.style.strokeWidth = (2 + level * 3.5).toFixed(1);
+      }
+
+      // Vibração proporcional do tímpano, alavanca dos ossículos e pistão do estribo
+      const tympScale = 1 + level * 0.34;
+      const ossShift = level * 8;
+      const ossRot = level * 6.5;
+      if (tymp) tymp.style.transform = `scale(${tympScale.toFixed(3)})`;
+      if (oss) oss.style.transform = `translateX(${ossShift.toFixed(1)}px) rotate(${ossRot.toFixed(1)}deg)`;
+      if (stapes) stapes.style.transform = `translateX(${(ossShift * 1.15).toFixed(1)}px)`;
+      const nerveDur = Math.max(0.22, 1.4 - level * 1.15);
+      document.documentElement.style.setProperty('--nerve-dur', `${nerveDur.toFixed(2)}s`);
+
+      const estimatedDb = Math.round(32 + level * 78);
+      const dbSlider = document.getElementById('db-slider');
+      if (dbSlider) dbSlider.value = estimatedDb;
+
+      let dominantFreq = Number(document.getElementById('freq-slider')?.value || 440);
+      if (level > 0.04 && audioCtx) {
+        const nyquist = audioCtx.sampleRate / 2;
+        dominantFreq = Math.max(100, Math.min(8000, Math.round((maxIdx / micDataArray.length) * nyquist)));
+        const freqSlider = document.getElementById('freq-slider');
+        if (freqSlider) freqSlider.value = dominantFreq;
+      }
+
+      updateAcousticParams(true, level);
+
+      if (statusText) {
+        statusText.textContent = level > 0.04
+          ? `Mic ao Vivo: ~${dominantFreq.toLocaleString('pt-BR')} Hz • ${estimatedDb} dB`
+          : 'Mic ao Vivo: Aguardando som (fale ou bata palmas)...';
+      }
+      if (statusDot) {
+        statusDot.className = level > 0.04
+          ? 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping'
+          : 'w-2.5 h-2.5 rounded-full bg-rose-400';
+      }
+
+      micAnimationId = requestAnimationFrame(processMicLoop);
+    }
+
+    // =========================================================================
+    // 12. LABORATÓRIO ACÚSTICO (GERADOR DE SOM, TONOTOPIA & OSCILOSCÓPIO)
+    // =========================================================================
+    function syncAudioButtonsUI(playing) {
+      const btn = document.getElementById('btn-audio-toggle');
+      const icon = document.getElementById('audio-icon');
+      const label = document.getElementById('audio-label');
+
+      const qBtn = document.getElementById('btn-quick-sound');
+      const qIcon = document.getElementById('quick-sound-icon');
+      const qLabel = document.getElementById('quick-sound-label');
+
+      if (playing) {
+        if (btn) btn.className = 'px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2';
+        if (icon) icon.className = 'fa-solid fa-stop';
+        if (label) label.textContent = 'Parar Som';
+
+        if (qBtn) qBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm transition flex items-center gap-1.5';
+        if (qIcon) qIcon.className = 'fa-solid fa-stop';
+        if (qLabel) qLabel.textContent = 'Parar Som';
+      } else {
+        if (btn) btn.className = 'px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2';
+        if (icon) icon.className = 'fa-solid fa-volume-high';
+        if (label) label.textContent = 'Ouvir Frequência';
+
+        if (qBtn) qBtn.className = 'px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition flex items-center gap-1.5';
+        if (qIcon) qIcon.className = 'fa-solid fa-volume-high';
+        if (qLabel) qLabel.textContent = 'Testar Som';
+      }
+    }
+
+    async function toggleAudioEngine() {
+      if (isAudioPlaying) {
+        stopMainAudio();
+        updateAcousticParams(false);
+        return;
+      }
+
+      try {
+        if (isMicActive) await toggleMicInput();
+        stopConditionAudio();
+        stopSweepAudio();
+
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const freq = Number(document.getElementById('freq-slider')?.value || 440);
+        const db = Number(document.getElementById('db-slider')?.value || 65);
+
+        oscillator = audioCtx.createOscillator();
+        gainNode = audioCtx.createGain();
+
+        oscillator.type = 'sine';
+        oscillator.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        const normalizedGain = Math.min(0.25, Math.max(0.005, ((db - 20) / 100) * 0.22));
+        gainNode.gain.setValueAtTime(normalizedGain, audioCtx.currentTime);
+
+        oscillator.connect(gainNode);
+        gainNode.connect(audioCtx.destination);
+        oscillator.start();
+
+        isAudioPlaying = true;
+        syncAudioButtonsUI(true);
+        updateAcousticParams(false);
+      } catch (err) {
+        console.error('Erro ao iniciar áudio:', err);
+        showToast('Clique na tela para liberar o áudio do navegador.');
+      }
+    }
+
+    function stopMainAudio() {
+      if (oscillator) {
+        try {
+          oscillator.stop();
+          oscillator.disconnect();
+        } catch (e) {}
+        oscillator = null;
+      }
+      isAudioPlaying = false;
+      syncAudioButtonsUI(false);
+    }
+
+    function updateAcousticParams(fromMic = false, micLevel = 0) {
+      const freqSlider = document.getElementById('freq-slider');
+      const dbSlider = document.getElementById('db-slider');
+      const freq = Number(freqSlider?.value || 440);
+      const db = Number(dbSlider?.value || 65);
+
+      const freqDisplay = document.getElementById('freq-display');
+      const freqCategory = document.getElementById('freq-category');
+      if (freqDisplay) freqDisplay.textContent = `${freq.toLocaleString('pt-BR')} Hz`;
+      if (freqCategory) {
+        if (freq < 300) {
+          freqCategory.textContent = 'Grave (Baixa Frequência)';
+        } else if (freq <= 2000) {
+          freqCategory.textContent = 'Médio / Voz Humana';
+        } else {
+          freqCategory.textContent = 'Agudo (Alta Frequência)';
+        }
+      }
+
+      const dbDisplay = document.getElementById('db-display');
+      const dbSafety = document.getElementById('db-safety');
+      if (dbDisplay) dbDisplay.textContent = `${db} dB`;
+      if (dbSafety) {
+        if (db < 60) {
+          dbSafety.textContent = 'Confortável / Seguro';
+          dbSafety.className = 'text-xs font-semibold text-emerald-600 dark:text-emerald-400';
+        } else if (db <= 85) {
+          dbSafety.textContent = 'Moderado';
+          dbSafety.className = 'text-xs font-semibold text-amber-600 dark:text-amber-400';
+        } else {
+          dbSafety.textContent = 'Risco Auditivo (>85 dB)';
+          dbSafety.className = 'text-xs font-semibold text-rose-600 dark:text-rose-400';
+        }
+      }
+
+      // Atualiza oscilador em tempo real caso o gerador sonoro esteja ativo
+      if (!fromMic && isAudioPlaying && oscillator && gainNode && audioCtx) {
+        oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.03);
+        const normalizedGain = Math.min(0.25, Math.max(0.005, ((db - 20) / 100) * 0.22));
+        gainNode.gain.setTargetAtTime(normalizedGain, audioCtx.currentTime, 0.03);
+      }
+
+      // Atualiza cursor tonotópico na membrana basilar (Base = Agudos à esquerda, Ápice = Graves à direita)
+      const ratio = (Math.log10(Math.max(100, freq)) - Math.log10(100)) / (Math.log10(8000) - Math.log10(100));
+      const clamped = Math.max(0, Math.min(1, ratio));
+      const cursor = document.getElementById('tonotopy-cursor');
+      const tonotopyLabel = document.getElementById('tonotopy-label');
+      if (cursor) {
+        const leftPct = 90 - clamped * 80;
+        cursor.style.left = `${leftPct.toFixed(1)}%`;
+      }
+      if (tonotopyLabel) {
+        if (freq > 2500) {
+          tonotopyLabel.textContent = 'Base da Cóclea (Agudos)';
+        } else if (freq >= 500) {
+          tonotopyLabel.textContent = 'Meio da Espiral (Médios)';
+        } else {
+          tonotopyLabel.textContent = 'Ápice da Cóclea (Graves)';
+        }
+      }
+
+      const intensityNorm = fromMic ? micLevel : Math.max(0, Math.min(1, (db - 20) / 100));
+      updateCochleaSpiralSpot(freq, intensityNorm);
+
+      // Atualiza medidor visual e parâmetros de vibração do diagrama SVG
+      const vuBar = document.getElementById('model-vu-bar');
+      if (vuBar) {
+        vuBar.style.width = `${Math.round(Math.max(6, intensityNorm * 100))}%`;
+      }
+
+      if (!fromMic) {
+        const waveDur = Math.max(0.35, 2.0 - clamped * 1.5);
+        const vibDur = Math.max(0.18, 0.95 - clamped * 0.72);
+        const nerveDur = Math.max(0.28, 1.3 - intensityNorm * 0.9);
+        const tympScale = 1.03 + intensityNorm * 0.16;
+        const ossShift = 1.5 + intensityNorm * 5.0;
+        const ossRot = 1.5 + intensityNorm * 4.5;
+
+        const rootStyle = document.documentElement.style;
+        rootStyle.setProperty('--wave-dur', `${waveDur.toFixed(2)}s`);
+        rootStyle.setProperty('--vib-dur', `${vibDur.toFixed(2)}s`);
+        rootStyle.setProperty('--nerve-dur', `${nerveDur.toFixed(2)}s`);
+        rootStyle.setProperty('--tymp-scale', tympScale.toFixed(3));
+        rootStyle.setProperty('--oss-shift', `${ossShift.toFixed(1)}px`);
+        rootStyle.setProperty('--oss-rot', `${ossRot.toFixed(1)}deg`);
+
+        const statusText = document.getElementById('model-status-text');
+        const statusDot = document.getElementById('model-status-dot');
+        if (statusText) {
+          statusText.textContent = isAudioPlaying
+            ? `Tocando: ${freq.toLocaleString('pt-BR')} Hz • ${db} dB`
+            : `Simulação: ${freq.toLocaleString('pt-BR')} Hz • ${db} dB`;
+        }
+        if (statusDot) {
+          statusDot.className = isAudioPlaying
+            ? 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping'
+            : 'w-2.5 h-2.5 rounded-full bg-indigo-500';
+        }
+      }
+    }
+
+    function updateCochleaSpiralSpot(freq, intensityNorm = 0.5) {
+      const spot = document.getElementById('cochlea-active-spot');
+      const halo = document.getElementById('cochlea-active-halo');
+      if (!spot) return;
+
+      const ratio = (Math.log10(Math.max(100, freq)) - Math.log10(100)) / (Math.log10(8000) - Math.log10(100));
+      const clamped = Math.max(0, Math.min(1, ratio));
+      // clamped = 1 -> Base (índice 0); clamped = 0 -> Ápice (último índice)
+      const exactIdx = (1 - clamped) * (COCHLEA_SPIRAL_POINTS.length - 1);
+      const idx0 = Math.floor(exactIdx);
+      const idx1 = Math.min(COCHLEA_SPIRAL_POINTS.length - 1, idx0 + 1);
+      const frac = exactIdx - idx0;
+
+      const p0 = COCHLEA_SPIRAL_POINTS[idx0];
+      const p1 = COCHLEA_SPIRAL_POINTS[idx1];
+      const x = p0.x + (p1.x - p0.x) * frac;
+      const y = p0.y + (p1.y - p0.y) * frac;
+
+      spot.setAttribute('cx', x.toFixed(1));
+      spot.setAttribute('cy', y.toFixed(1));
+      spot.setAttribute('r', (4.8 + intensityNorm * 4.2).toFixed(1));
+
+      if (halo) {
+        halo.setAttribute('cx', x.toFixed(1));
+        halo.setAttribute('cy', y.toFixed(1));
+        halo.setAttribute('r', (10 + intensityNorm * 8).toFixed(1));
+      }
+    }
+
+    function initOscilloscope() {
+      oscCanvas = document.getElementById('oscilloscope-canvas');
+      if (!oscCanvas) return;
+      oscCtx = oscCanvas.getContext('2d');
+      resizeOscilloscope();
+      window.addEventListener('resize', resizeOscilloscope);
+      drawOscilloscope();
+    }
+
+    function resizeOscilloscope() {
+      if (!oscCanvas) return;
+      const rect = oscCanvas.parentElement?.getBoundingClientRect();
+      if (rect && rect.width > 0) {
+        oscCanvas.width = rect.width;
+        oscCanvas.height = 150;
+      }
+    }
+
+    function drawOscilloscope() {
+      if (oscCanvas && oscCtx) {
+        const w = oscCanvas.width;
+        const h = oscCanvas.height;
+        oscCtx.clearRect(0, 0, w, h);
+
+        oscCtx.strokeStyle = 'rgba(148, 163, 184, 0.18)';
+        oscCtx.lineWidth = 1;
+        oscCtx.beginPath();
+        oscCtx.moveTo(0, h / 2);
+        oscCtx.lineTo(w, h / 2);
+        oscCtx.stroke();
+
+        const freq = Number(document.getElementById('freq-slider')?.value || 440);
+        const db = Number(document.getElementById('db-slider')?.value || 65);
+
+        const cycles = 2 + (freq / 8000) * 18;
+        const amp = ((db - 20) / 100) * (h * 0.42);
+
+        oscCtx.strokeStyle = '#6366f1';
+        oscCtx.lineWidth = 3;
+        oscCtx.beginPath();
+
+        for (let x = 0; x <= w; x++) {
+          const t = (x / w) * Math.PI * 2 * cycles + oscPhase;
+          const y = h / 2 + Math.sin(t) * amp;
+          if (x === 0) oscCtx.moveTo(x, y);
+          else oscCtx.lineTo(x, y);
+        }
+        oscCtx.stroke();
+
+        oscPhase += 0.08 + (freq / 8000) * 0.25;
+      }
+      requestAnimationFrame(drawOscilloscope);
+    }
+
+    // =========================================================================
+    // 13. DESAFIO DA IDADE AUDITIVA (8.000 Hz – 18.000 Hz)
+    // =========================================================================
+    async function toggleSweepTest() {
+      if (isSweepRunning) {
+        stopSweepAudio();
+        return;
+      }
+
+      try {
+        stopMainAudio();
+        stopConditionAudio();
+
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        sweepFreq = 8000;
+        isSweepRunning = true;
+
+        sweepOsc = audioCtx.createOscillator();
+        sweepGain = audioCtx.createGain();
+        sweepOsc.type = 'sine';
+        sweepOsc.frequency.setValueAtTime(sweepFreq, audioCtx.currentTime);
+        sweepGain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+
+        sweepOsc.connect(sweepGain);
+        sweepGain.connect(audioCtx.destination);
+        sweepOsc.start();
+
+        const btnStart = document.getElementById('btn-sweep-start');
+        const btnStop = document.getElementById('btn-sweep-stop');
+        const resultBox = document.getElementById('sweep-result-box');
+
+        if (btnStart) btnStart.classList.add('hidden');
+        if (btnStop) btnStop.classList.remove('hidden');
+        if (resultBox) resultBox.classList.add('hidden');
+
+        sweepInterval = setInterval(() => {
+          sweepFreq += 150;
+          if (sweepFreq >= 18000) {
+            sweepFreq = 18000;
+            stopSweepHere();
+            return;
+          }
+          if (sweepOsc && audioCtx) {
+            sweepOsc.frequency.setTargetAtTime(sweepFreq, audioCtx.currentTime, 0.04);
+          }
+          updateSweepUI();
+        }, 180);
+      } catch (err) {
+        console.error('Erro na varredura:', err);
+        showToast('Não foi possível iniciar o teste sonoro.');
+      }
+    }
+
+    function updateSweepUI() {
+      const disp = document.getElementById('sweep-freq-display');
+      const bar = document.getElementById('sweep-progress-bar');
+      if (disp) disp.textContent = `${sweepFreq.toLocaleString('pt-BR')} Hz`;
+      if (bar) {
+        const pct = Math.min(100, Math.max(0, ((sweepFreq - 8000) / 10000) * 100));
+        bar.style.width = `${pct}%`;
+      }
+    }
+
+    function stopSweepAudio() {
+      clearInterval(sweepInterval);
+      isSweepRunning = false;
+      if (sweepOsc) {
+        try {
+          sweepOsc.stop();
+          sweepOsc.disconnect();
+        } catch (e) {}
+        sweepOsc = null;
+      }
+      const btnStart = document.getElementById('btn-sweep-start');
+      const btnStop = document.getElementById('btn-sweep-stop');
+      if (btnStart) btnStart.classList.remove('hidden');
+      if (btnStop) btnStop.classList.add('hidden');
+    }
+
+    function stopSweepHere() {
+      const finalFreq = sweepFreq;
+      stopSweepAudio();
+      updateSweepUI();
+
+      const resultBox = document.getElementById('sweep-result-box');
+      const title = document.getElementById('sweep-result-title');
+      const desc = document.getElementById('sweep-result-desc');
+
+      let ageEstimate = '';
+      if (finalFreq >= 16500) {
+        ageEstimate = 'Audição Ultra-Aguda (Perfil Jovem / Adolescente < 20 anos)';
+      } else if (finalFreq >= 14000) {
+        ageEstimate = 'Excelente Sensibilidade (Perfil Adulto Jovem: 20 a 35 anos)';
+      } else if (finalFreq >= 11500) {
+        ageEstimate = 'Faixa Adulta Intermediária (Perfil 35 a 50 anos)';
+      } else {
+        ageEstimate = 'Sensibilidade Reduzida para Agudos (Presbiacusia natural ou limite dos alto-falantes)';
+      }
+
+      if (title) title.textContent = `Você ouviu até ${finalFreq.toLocaleString('pt-BR')} Hz!`;
+      if (desc) desc.textContent = `${ageEstimate}. Com o passar dos anos, as células ciliadas da base da cóclea sofrem desgaste natural, reduzindo a captação dos sons mais agudos.`;
+      if (resultBox) resultBox.classList.remove('hidden');
+    }
+
+    // =========================================================================
+    // 14. SIMULADOR DE CONDIÇÕES AUDITIVAS
+    // =========================================================================
+    function renderConditionCards() {
+      const container = document.getElementById('condition-cards');
+      if (!container) return;
+      container.innerHTML = '';
+
+      Object.values(CONDITIONS_DATA).forEach(cond => {
+        const btn = document.createElement('button');
+        btn.id = `cond-card-${cond.id}`;
+        btn.type = 'button';
+        btn.className = 'w-full text-left p-4 rounded-2xl border transition border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-400';
+        btn.innerHTML = `
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <span class="font-bold text-sm text-slate-900 dark:text-white">${cond.name}</span>
+          </div>
+          <span class="inline-block px-2 py-0.5 rounded-md text-[11px] font-semibold ${cond.badgeClass}">${cond.badge}</span>
+        `;
+        btn.onclick = () => selectCondition(cond.id);
+        container.appendChild(btn);
+      });
+    }
+
+    function selectCondition(id) {
+      const cond = CONDITIONS_DATA[id];
+      if (!cond) return;
+      currentConditionId = id;
+
+      Object.keys(CONDITIONS_DATA).forEach(key => {
+        const card = document.getElementById(`cond-card-${key}`);
+        if (!card) return;
+        if (key === id) {
+          card.className = 'w-full text-left p-4 rounded-2xl border-2 transition border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/30 shadow-sm';
+        } else {
+          card.className = 'w-full text-left p-4 rounded-2xl border transition border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-indigo-400';
+        }
+      });
+
+      const title = document.getElementById('cond-title');
+      const badge = document.getElementById('cond-type-badge');
+      const desc = document.getElementById('cond-desc');
+      const impact = document.getElementById('cond-impact');
+      const prev = document.getElementById('cond-prevention');
+      const bar = document.getElementById('cond-spectrum-bar');
+      const specLabel = document.getElementById('cond-spectrum-label');
+
+      if (title) title.textContent = cond.name;
+      if (badge) {
+        badge.textContent = cond.badge;
+        badge.className = `inline-block px-2.5 py-1 rounded-lg text-xs font-bold ${cond.badgeClass}`;
+      }
+      if (desc) desc.textContent = cond.desc;
+      if (impact) impact.textContent = cond.impact;
+      if (prev) prev.textContent = cond.prevention;
+      if (bar) {
+        bar.style.width = cond.spectrumWidth;
+        bar.className = `h-full rounded-full transition-all duration-500 ${cond.spectrumColor}`;
+      }
+      if (specLabel) specLabel.textContent = cond.spectrumLabel;
+
+      if (condAudioPlaying) {
+        stopConditionAudio();
+        toggleConditionAudio();
+      }
+    }
+
+    async function toggleConditionAudio() {
+      const btn = document.getElementById('btn-cond-audio');
+      if (condAudioPlaying) {
+        stopConditionAudio();
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-headphones"></i> <span>Ouvir Simulação Sonora</span>';
+        return;
+      }
+
+      try {
+        stopMainAudio();
+        stopSweepAudio();
+
+        if (!audioCtx) {
+          audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (audioCtx.state === 'suspended') {
+          await audioCtx.resume();
+        }
+
+        const cond = CONDITIONS_DATA[currentConditionId] || CONDITIONS_DATA.normal;
+
+        condOsc = audioCtx.createOscillator();
+        condFilter = audioCtx.createBiquadFilter();
+        condGain = audioCtx.createGain();
+
+        condOsc.type = 'sawtooth';
+        condOsc.frequency.setValueAtTime(220, audioCtx.currentTime);
+
+        condFilter.type = cond.filterType;
+        condFilter.frequency.setValueAtTime(cond.filterFreq, audioCtx.currentTime);
+
+        condGain.gain.setValueAtTime(0.09 * cond.gainMult, audioCtx.currentTime);
+
+        condOsc.connect(condFilter);
+        condFilter.connect(condGain);
+        condGain.connect(audioCtx.destination);
+        condOsc.start();
+
+        window._condModInterval = setInterval(() => {
+          if (!condOsc || !audioCtx) return;
+          const notes = [220, 277.18, 329.63, 440, 329.63, 293.66];
+          const nextNote = notes[Math.floor(Math.random() * notes.length)];
+          condOsc.frequency.setTargetAtTime(nextNote, audioCtx.currentTime, 0.05);
+        }, 320);
+
+        if (cond.tinnitus) {
+          condTinnitusOsc = audioCtx.createOscillator();
+          const tinGain = audioCtx.createGain();
+          condTinnitusOsc.type = 'sine';
+          condTinnitusOsc.frequency.setValueAtTime(4600, audioCtx.currentTime);
+          tinGain.gain.setValueAtTime(0.035, audioCtx.currentTime);
+          condTinnitusOsc.connect(tinGain);
+          tinGain.connect(audioCtx.destination);
+          condTinnitusOsc.start();
+        }
+
+        condAudioPlaying = true;
+        if (btn) btn.innerHTML = '<i class="fa-solid fa-stop"></i> <span>Parar Simulação</span>';
+      } catch (err) {
+        console.error('Erro na simulação sonora:', err);
+        showToast('Não foi possível reproduzir o áudio da simulação.');
+      }
+    }
+
+    function stopConditionAudio() {
+      clearInterval(window._condModInterval);
+      if (condOsc) {
+        try { condOsc.stop(); condOsc.disconnect(); } catch (e) {}
+        condOsc = null;
+      }
+      if (condTinnitusOsc) {
+        try { condTinnitusOsc.stop(); condTinnitusOsc.disconnect(); } catch (e) {}
+        condTinnitusOsc = null;
+      }
+      condAudioPlaying = false;
+      const btn = document.getElementById('btn-cond-audio');
+      if (btn) btn.innerHTML = '<i class="fa-solid fa-headphones"></i> <span>Ouvir Simulação Sonora</span>';
+    }
+
+    // =========================================================================
+    // 15. QUIZ INTERATIVO COM SORTEIO DE 5 QUESTÕES ALEATÓRIAS
+    // =========================================================================
+    function generateNewQuizRound(notify = false) {
+      const shuffled = [...QUIZ_POOL];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      activeQuizQuestions = shuffled.slice(0, QUIZ_ROUND_SIZE);
+      userAnswers = new Array(QUIZ_ROUND_SIZE).fill(null);
+
+      const scoreEl = document.getElementById('quiz-score');
+      if (scoreEl) scoreEl.textContent = '0';
+
+      renderQuiz();
+
+      if (notify) {
+        showToast('5 novas perguntas aleatórias sorteadas!');
+      }
+    }
+
+    function renderQuiz() {
+      const container = document.getElementById('quiz-container');
+      const totalEl = document.getElementById('quiz-total');
+      if (!container) return;
+      if (totalEl) totalEl.textContent = activeQuizQuestions.length;
+
+      container.innerHTML = '';
+
+      activeQuizQuestions.forEach((item, qIdx) => {
+        const card = document.createElement('div');
+        card.className = 'p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-3';
+
+        const qTitle = document.createElement('h3');
+        qTitle.className = 'font-bold text-sm sm:text-base text-slate-900 dark:text-white';
+        qTitle.textContent = `${qIdx + 1}. ${item.q}`;
+        card.appendChild(qTitle);
+
+        const optsGrid = document.createElement('div');
+        optsGrid.className = 'grid grid-cols-1 sm:grid-cols-2 gap-2';
+
+        item.options.forEach((optText, optIdx) => {
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          const chosen = userAnswers[qIdx];
+
+          let btnStyle = 'bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-indigo-500';
+          if (chosen !== null) {
+            if (optIdx === item.answer) {
+              btnStyle = 'bg-emerald-600 border-emerald-600 text-white font-bold';
+            } else if (optIdx === chosen && chosen !== item.answer) {
+              btnStyle = 'bg-rose-600 border-rose-600 text-white';
+            } else {
+              btnStyle = 'bg-white/50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-400';
+            }
+          }
+
+          btn.className = `text-left px-3.5 py-2.5 rounded-xl text-xs sm:text-sm border transition ${btnStyle}`;
+          btn.textContent = optText;
+          btn.disabled = chosen !== null;
+          btn.onclick = () => handleQuizAnswer(qIdx, optIdx);
+          optsGrid.appendChild(btn);
+        });
+
+        card.appendChild(optsGrid);
+
+        if (userAnswers[qIdx] !== null) {
+          const feedback = document.createElement('p');
+          const isCorrect = userAnswers[qIdx] === item.answer;
+          feedback.className = `text-xs p-2.5 rounded-xl ${isCorrect ? 'bg-emerald-100/80 text-emerald-900 dark:bg-emerald-950/60 dark:text-emerald-200' : 'bg-rose-100/80 text-rose-900 dark:bg-rose-950/60 dark:text-rose-200'}`;
+          feedback.innerHTML = `<strong>${isCorrect ? 'Correto!' : 'Quase lá!'}</strong> ${item.explanation}`;
+          card.appendChild(feedback);
+        }
+
+        container.appendChild(card);
+      });
+
+      if (activeQuizQuestions.length > 0 && userAnswers.every(a => a !== null)) {
+        const score = userAnswers.reduce((acc, ans, idx) => acc + (ans === activeQuizQuestions[idx].answer ? 1 : 0), 0);
+        const summary = document.createElement('div');
+        summary.className = 'p-4 rounded-2xl bg-indigo-600 text-white flex flex-wrap items-center justify-between gap-3';
+        summary.innerHTML = `
+          <div>
+            <p class="font-extrabold text-base">Rodada Concluída! Você acertou ${score} de ${activeQuizQuestions.length} questões.</p>
+            <p class="text-xs text-indigo-100">Clique ao lado para sortear outro conjunto de perguntas do banco de 20 questões.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" onclick="resetQuiz()" class="px-3.5 py-2 rounded-xl bg-indigo-500/60 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm transition">
+              Repetir Estas
+            </button>
+            <button type="button" onclick="generateNewQuizRound(true)" class="px-4 py-2 rounded-xl bg-white text-indigo-700 font-bold text-xs sm:text-sm hover:bg-indigo-50 shadow transition flex items-center gap-1.5">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Novas 5 Perguntas</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(summary);
+      }
+    }
+
+    function handleQuizAnswer(qIdx, optIdx) {
+      userAnswers[qIdx] = optIdx;
+      const score = userAnswers.reduce((acc, ans, idx) => acc + (ans !== null && ans === activeQuizQuestions[idx].answer ? 1 : 0), 0);
+      const scoreEl = document.getElementById('quiz-score');
+      if (scoreEl) scoreEl.textContent = score;
+      renderQuiz();
+    }
+
+    function resetQuiz() {
+      userAnswers = new Array(activeQuizQuestions.length).fill(null);
+      const scoreEl = document.getElementById('quiz-score');
+      if (scoreEl) scoreEl.textContent = '0';
+      renderQuiz();
+    }
+
+    // Exposição explícita no escopo global (window)
+    window.switchTab = switchTab;
+    window.selectStructure = selectStructure;
+    window.toggleWaveAnimation = toggleWaveAnimation;
+    window.toggleGuideModal = toggleGuideModal;
+    window.prevGuideStep = prevGuideStep;
+    window.nextGuideStep = nextGuideStep;
+    window.openCortiModal = openCortiModal;
+    window.closeCortiModal = closeCortiModal;
+    window.setCortiState = setCortiState;
+    window.toggleMicInput = toggleMicInput;
+    window.toggleAudioEngine = toggleAudioEngine;
+    window.updateAcousticParams = updateAcousticParams;
+    window.toggleSweepTest = toggleSweepTest;
+    window.stopSweepHere = stopSweepHere;
+    window.selectCondition = selectCondition;
+    window.toggleConditionAudio = toggleConditionAudio;
+    window.generateNewQuizRound = generateNewQuizRound;
+    window.resetQuiz = resetQuiz;
+  </script>
+</body>
+</html>
