@@ -26,14 +26,14 @@
     /* Animações das ondas sonoras e estruturas do ouvido */
     @keyframes waveTravel {
       0% {
-        transform: translateX(-18px);
+        transform: translateX(-20px);
         opacity: 0.15;
       }
       50% {
         opacity: 0.95;
       }
       100% {
-        transform: translateX(22px);
+        transform: translateX(26px);
         opacity: 0.1;
       }
     }
@@ -67,7 +67,7 @@
 
     @keyframes cochlearRipple {
       0% {
-        stroke-dashoffset: 48;
+        stroke-dashoffset: 64;
         opacity: 0.35;
       }
       50% {
@@ -81,7 +81,7 @@
 
     @keyframes nerveSpark {
       0% {
-        stroke-dashoffset: 80;
+        stroke-dashoffset: 96;
         opacity: 0.35;
       }
       50% {
@@ -140,15 +140,6 @@
       }
     }
 
-    @keyframes basilarSwell {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-4px);
-      }
-    }
-
     #sound-waves {
       animation: waveTravel var(--wave-dur) ease-in-out infinite;
     }
@@ -160,7 +151,7 @@
     }
 
     #ossicles-group {
-      transform-origin: 395px 175px;
+      transform-origin: 572px 376px;
       animation: ossiclesRock var(--vib-dur) ease-in-out infinite;
     }
 
@@ -169,7 +160,7 @@
     }
 
     #cochlea-fluid-wave {
-      stroke-dasharray: 10 14;
+      stroke-dasharray: 12 18;
       animation: cochlearRipple var(--vib-dur) linear infinite;
     }
 
@@ -181,7 +172,7 @@
 
     #nerve-impulses,
     #nerve-impulses-2 {
-      stroke-dasharray: 10 14;
+      stroke-dasharray: 14 18;
       animation: nerveSpark var(--nerve-dur) linear infinite;
     }
 
@@ -270,16 +261,63 @@
     }
 
     .structure-group:hover {
-      filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.7));
+      filter: drop-shadow(0 0 8px rgba(37, 99, 235, 0.45));
     }
 
     .structure-group.active-part {
-      filter: drop-shadow(0 0 12px rgba(79, 70, 229, 0.95));
+      filter: drop-shadow(0 0 12px rgba(37, 99, 235, 0.75));
     }
 
     .structure-group.active-part .part-highlight {
-      stroke: #4f46e5 !important;
-      stroke-width: 3.5px !important;
+      stroke: #2563eb !important;
+      stroke-width: 4.2px !important;
+    }
+
+    /* Destaque por região anatômica (Orelha Externa, Média ou Interna) */
+    .structure-group.zone-highlight {
+      filter: drop-shadow(0 0 10px rgba(56, 189, 248, 0.85));
+    }
+
+    .structure-group.zone-highlight .part-highlight {
+      stroke: #38bdf8 !important;
+      stroke-width: 3.8px !important;
+    }
+
+    .structure-group.zone-dimmed {
+      opacity: 0.28;
+      filter: grayscale(0.45);
+    }
+
+    /* Legendas clicáveis estilo ilustração didática clara */
+    .callout-item {
+      cursor: pointer;
+    }
+
+    .callout-item:hover .callout-text {
+      fill: #facc15;
+    }
+
+    .callout-item:hover .callout-line {
+      stroke: #facc15;
+      stroke-width: 3.4px;
+    }
+
+    .callout-item:hover .callout-dot {
+      fill: #facc15;
+    }
+
+    .callout-item.active-part .callout-text {
+      fill: #facc15;
+      font-weight: 800;
+    }
+
+    .callout-item.active-part .callout-line {
+      stroke: #facc15;
+      stroke-width: 3.6px;
+    }
+
+    .callout-item.active-part .callout-dot {
+      fill: #facc15;
     }
   </style>
 </head>
@@ -324,7 +362,6 @@
     <!-- Barra de Navegação entre Módulos -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 pb-3 flex items-center gap-2 overflow-x-auto">
       <button id="tab-btn-anatomia" type="button" onclick="switchTab('anatomia')" class="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-indigo-600 text-white shadow-sm transition flex items-center gap-2 whitespace-nowrap">
-        <i class="fa-solid fa-lungs-virus hidden"></i>
         <i class="fa-solid fa-sitemap"></i>
         <span>1. Anatomia &amp; Transdução</span>
       </button>
@@ -355,10 +392,14 @@
     <section id="tab-anatomia" class="space-y-5">
       <!-- Pílulas de Seleção Rápida -->
       <div class="bg-white dark:bg-slate-900 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
-        <div class="flex items-center justify-between gap-2 mb-2.5">
-          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-            Selecione uma estrutura no diagrama ou clique abaixo:
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+          <span id="pills-filter-label" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+            Clique em qualquer estrutura ou legenda na ilustração, ou selecione abaixo:
           </span>
+          <button id="btn-clear-zone" type="button" onclick="selectZone('all')" class="hidden px-2.5 py-1 rounded-lg text-[11px] font-bold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition flex items-center gap-1">
+            <i class="fa-solid fa-layer-group"></i>
+            <span>Mostrar Todas (10)</span>
+          </button>
         </div>
         <div id="structure-pills" class="flex flex-wrap gap-1.5"></div>
       </div>
@@ -367,13 +408,22 @@
         <!-- Coluna Esquerda: Diagrama Anatômico Interativo SVG -->
         <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-4">
           <div class="flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2 text-xs font-semibold">
-              <span class="px-2.5 py-1 rounded-lg bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">Orelha Externa</span>
-              <span class="px-2.5 py-1 rounded-lg bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300">Orelha Média</span>
-              <span class="px-2.5 py-1 rounded-lg bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">Orelha Interna</span>
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold">
+              <button id="zone-btn-externa" type="button" onclick="selectZone('externa')" class="px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-900/50 dark:hover:bg-sky-800/70 dark:text-sky-300 border border-sky-300/70 dark:border-sky-700/60 transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-ear-listen text-[11px]"></i>
+                <span>Orelha Externa</span>
+              </button>
+              <button id="zone-btn-media" type="button" onclick="selectZone('media')" class="px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:hover:bg-amber-800/70 dark:text-amber-300 border border-amber-300/70 dark:border-amber-700/60 transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-gears text-[11px]"></i>
+                <span>Orelha Média</span>
+              </button>
+              <button id="zone-btn-interna" type="button" onclick="selectZone('interna')" class="px-3 py-1.5 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-900/50 dark:hover:bg-indigo-800/70 dark:text-indigo-300 border border-indigo-300/70 dark:border-indigo-700/60 transition flex items-center gap-1.5 cursor-pointer">
+                <i class="fa-solid fa-bolt text-[11px]"></i>
+                <span>Orelha Interna</span>
+              </button>
             </div>
 
-            <div class="flex items-center gap-2">
+            <div class="flex flex-wrap items-center gap-2">
               <button id="btn-quick-sound" type="button" onclick="toggleAudioEngine()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/70 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 transition flex items-center gap-1.5">
                 <i id="quick-sound-icon" class="fa-solid fa-volume-high"></i>
                 <span id="quick-sound-label">Testar Som</span>
@@ -382,6 +432,11 @@
               <button type="button" onclick="toggleWaveAnimation()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5">
                 <i id="wave-icon" class="fa-solid fa-pause"></i>
                 <span id="wave-label">Pausar Ondas</span>
+              </button>
+
+              <button type="button" onclick="toggleCalloutLabels()" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition flex items-center gap-1.5">
+                <i id="labels-icon" class="fa-solid fa-eye-slash"></i>
+                <span id="labels-label">Ocultar Legendas</span>
               </button>
 
               <button type="button" onclick="openCortiModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/70 dark:hover:bg-indigo-900/80 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 transition flex items-center gap-1.5">
@@ -405,99 +460,84 @@
             </div>
           </div>
 
-          <!-- SVG Anatômico Vetorial Completo -->
-          <div class="relative w-full overflow-hidden rounded-2xl bg-gradient-to-b from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900 border border-slate-200/80 dark:border-slate-800">
-            <svg id="ear-svg" viewBox="0 0 820 440" class="w-full h-auto block select-none" role="img" aria-label="Diagrama interativo do sistema auditivo humano">
+          <!-- SVG Anatômico Interativo -->
+          <div class="relative w-full overflow-hidden rounded-2xl bg-[#042336] border border-slate-700/80 shadow-inner">
+            <svg id="ear-svg" viewBox="0 0 1020 820" class="w-full h-auto block select-none" role="img" aria-label="Ilustração anatômica interativa do sistema auditivo humano">
               <defs>
-                <!-- Gradientes das Zonas Anatômicas -->
-                <linearGradient id="bgZones" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#e0f2fe" stop-opacity="0.45" />
-                  <stop offset="42%" stop-color="#fef3c7" stop-opacity="0.45" />
-                  <stop offset="100%" stop-color="#e0e7ff" stop-opacity="0.55" />
-                </linearGradient>
-
-                <!-- Textura e Gradiente do Osso Temporal -->
-                <linearGradient id="temporalBoneGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#f5e6d3" />
-                  <stop offset="50%" stop-color="#ead2b7" />
-                  <stop offset="100%" stop-color="#dec09f" />
-                </linearGradient>
-
-                <pattern id="boneTrabeculae" width="16" height="16" patternUnits="userSpaceOnUse">
-                  <circle cx="4" cy="4" r="2.2" fill="#d4b08c" opacity="0.35" />
-                  <circle cx="12" cy="11" r="2.8" fill="#c89f76" opacity="0.3" />
-                  <circle cx="13" cy="3" r="1.4" fill="#fff7ed" opacity="0.45" />
-                </pattern>
-
-                <!-- Pavilhão Auricular (Pele e Cartilagem) -->
-                <linearGradient id="pinnaSkinGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#ffd8be" />
-                  <stop offset="55%" stop-color="#f8b496" />
-                  <stop offset="100%" stop-color="#e59273" />
-                </linearGradient>
-
-                <!-- Canal Auditivo -->
-                <linearGradient id="canalGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-                  <stop offset="0%" stop-color="#d97757" />
-                  <stop offset="30%" stop-color="#f4a27e" />
-                  <stop offset="70%" stop-color="#f8b99a" />
-                  <stop offset="100%" stop-color="#c96849" />
-                </linearGradient>
-
-                <!-- Cavidade Timpânica (Orelha Média) -->
-                <radialGradient id="middleEarCavity" cx="50%" cy="45%" r="55%">
-                  <stop offset="0%" stop-color="#fffbeb" />
-                  <stop offset="70%" stop-color="#fde68a" />
-                  <stop offset="100%" stop-color="#f59e0b" stop-opacity="0.45" />
+                <!-- Fundo Azul-Petróleo Profundo -->
+                <radialGradient id="deepNavyBg" cx="45%" cy="45%" r="68%">
+                  <stop offset="0%" stop-color="#07324a" />
+                  <stop offset="65%" stop-color="#042133" />
+                  <stop offset="100%" stop-color="#02131f" />
                 </radialGradient>
 
-                <!-- Tímpano Translúcido -->
-                <radialGradient id="tympanumGrad" cx="45%" cy="50%" r="55%">
-                  <stop offset="0%" stop-color="#ffe4e6" />
-                  <stop offset="65%" stop-color="#fda4af" />
-                  <stop offset="100%" stop-color="#e11d48" />
+                <!-- Pavilhão Auricular em Pêssego Sombreado -->
+                <linearGradient id="pinnaWarmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f7cfb8" />
+                  <stop offset="52%" stop-color="#e3a68c" />
+                  <stop offset="100%" stop-color="#b56c54" />
+                </linearGradient>
+
+                <radialGradient id="conchaInnerGrad" cx="55%" cy="50%" r="58%">
+                  <stop offset="0%" stop-color="#9c5242" stop-opacity="0.72" />
+                  <stop offset="65%" stop-color="#c97d65" stop-opacity="0.35" />
+                  <stop offset="100%" stop-color="#ebb498" stop-opacity="0.05" />
                 </radialGradient>
 
-                <!-- Ossículos (Marfim 3D) -->
-                <linearGradient id="boneOssicleGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <!-- Canal Auditivo Externo em Coral -->
+                <linearGradient id="canalCoralGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#a8463c" />
+                  <stop offset="28%" stop-color="#df8674" />
+                  <stop offset="52%" stop-color="#f2ada0" />
+                  <stop offset="78%" stop-color="#d47968" />
+                  <stop offset="100%" stop-color="#943930" />
+                </linearGradient>
+
+                <!-- Cavidade & Tuba Auditiva -->
+                <linearGradient id="cavityCoralGrad" x1="15%" y1="10%" x2="88%" y2="95%">
+                  <stop offset="0%" stop-color="#d4685c" />
+                  <stop offset="55%" stop-color="#c4564a" />
+                  <stop offset="100%" stop-color="#9e3b31" />
+                </linearGradient>
+
+                <!-- Tímpano Verde-Água Translúcido -->
+                <radialGradient id="tympanumTealGrad" cx="42%" cy="42%" r="62%">
+                  <stop offset="0%" stop-color="#9fd4bd" stop-opacity="0.78" />
+                  <stop offset="65%" stop-color="#69ab92" stop-opacity="0.82" />
+                  <stop offset="100%" stop-color="#45826c" stop-opacity="0.90" />
+                </radialGradient>
+
+                <!-- Ossículos em Marfim Esculpido -->
+                <linearGradient id="ossicleIvoryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#ffffff" />
-                  <stop offset="55%" stop-color="#e2e8f0" />
-                  <stop offset="100%" stop-color="#94a3b8" />
+                  <stop offset="55%" stop-color="#f2ece1" />
+                  <stop offset="100%" stop-color="#cfc3ae" />
                 </linearGradient>
 
-                <!-- Labirinto e Cóclea (3D Azul/Índigo) -->
-                <linearGradient id="labyrinthTubeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#a5b4fc" />
-                  <stop offset="50%" stop-color="#6366f1" />
-                  <stop offset="100%" stop-color="#3730a3" />
-                </linearGradient>
-
-                <radialGradient id="cochleaShellGrad" cx="38%" cy="35%" r="65%">
-                  <stop offset="0%" stop-color="#c7d2fe" />
-                  <stop offset="40%" stop-color="#6366f1" />
-                  <stop offset="85%" stop-color="#3730a3" />
-                  <stop offset="100%" stop-color="#1e1b4b" />
+                <!-- Labirinto e Cóclea em Roxo-Violeta -->
+                <radialGradient id="labyrinthVioletGrad" cx="38%" cy="34%" r="68%">
+                  <stop offset="0%" stop-color="#e3c4f2" />
+                  <stop offset="48%" stop-color="#b888cf" />
+                  <stop offset="88%" stop-color="#8754a3" />
+                  <stop offset="100%" stop-color="#5c3275" />
                 </radialGradient>
 
-                <!-- Nervo Auditivo & Cérebro -->
-                <linearGradient id="nerveGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stop-color="#fef08a" />
-                  <stop offset="60%" stop-color="#facc15" />
-                  <stop offset="100%" stop-color="#eab308" />
+                <!-- Nervo Auditivo -->
+                <linearGradient id="nerveOliveYellowGrad" x1="0%" y1="0%" x2="100%" y2="15%">
+                  <stop offset="0%" stop-color="#97bf3b" />
+                  <stop offset="32%" stop-color="#e5cf3c" />
+                  <stop offset="75%" stop-color="#cfba30" />
+                  <stop offset="100%" stop-color="#9ab832" />
                 </linearGradient>
 
-                <radialGradient id="brainCortexGrad" cx="40%" cy="40%" r="60%">
-                  <stop offset="0%" stop-color="#fbcfe8" />
-                  <stop offset="70%" stop-color="#f472b6" />
-                  <stop offset="100%" stop-color="#db2777" />
-                </radialGradient>
+                <!-- Etiquetas Escuras com Borda Sutil -->
+                <linearGradient id="labelPillBg" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#0a283d" stop-opacity="0.92" />
+                  <stop offset="100%" stop-color="#051826" stop-opacity="0.95" />
+                </linearGradient>
 
-                <filter id="softShadow" x="-10%" y="-10%" width="125%" height="125%">
-                  <feDropShadow dx="1" dy="2" stdDeviation="2.5" flood-color="#0f172a" flood-opacity="0.18" />
-                </filter>
-
-                <filter id="glowYellow" x="-40%" y="-40%" width="180%" height="180%">
-                  <feGaussianBlur stdDeviation="3" result="blur" />
+                <filter id="glowYellow" x="-45%" y="-45%" width="190%" height="190%">
+                  <feGaussianBlur stdDeviation="3.8" result="blur" />
                   <feMerge>
                     <feMergeNode in="blur" />
                     <feMergeNode in="SourceGraphic" />
@@ -505,323 +545,469 @@
                 </filter>
               </defs>
 
-              <!-- Fundo dividido por regiões anatômicas -->
-              <rect x="0" y="0" width="820" height="440" fill="url(#bgZones)" />
-              <line x1="345" y1="20" x2="345" y2="420" stroke="#94a3b8" stroke-dasharray="5 5" stroke-opacity="0.45" />
-              <line x1="538" y1="20" x2="538" y2="420" stroke="#94a3b8" stroke-dasharray="5 5" stroke-opacity="0.45" />
+              <!-- Fundo Azul-Petróleo -->
+              <rect x="0" y="0" width="1020" height="820" fill="url(#deepNavyBg)" />
 
-              <!-- Rótulos das Divisões -->
-              <text x="172" y="28" text-anchor="middle" fill="#0284c7" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA EXTERNA</text>
-              <text x="442" y="28" text-anchor="middle" fill="#d97706" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA MÉDIA</text>
-              <text x="680" y="28" text-anchor="middle" fill="#4f46e5" font-size="12.5" font-weight="800" letter-spacing="0.6">ORELHA INTERNA &amp; CÉREBRO</text>
+              <!-- ============================================================= -->
+              <!-- 1. PAVILHÃO AURICULAR                                         -->
+              <!-- ============================================================= -->
+              <g class="structure-group" data-id="pavilhao" onclick="selectStructure('pavilhao')">
+                <path class="part-highlight" d="M 156 46 C 98 46, 56 122, 54 228 C 52 314, 70 402, 80 490 C 90 582, 106 680, 134 756 C 148 790, 192 802, 224 786 C 248 774, 256 742, 240 716 C 222 742, 202 748, 190 720 C 176 684, 170 632, 172 596 C 174 566, 202 548, 236 530 L 244 526 L 244 414 C 216 402, 216 372, 244 352 C 258 338, 246 310, 204 302 C 184 298, 182 272, 198 246 C 214 220, 182 200, 188 176 C 194 156, 218 156, 244 172 C 234 114, 198 46, 156 46 Z" fill="url(#pinnaWarmGrad)" stroke="#8c4736" stroke-width="4.5" stroke-linejoin="round" />
 
-              <!-- Corte Anatômico do Osso Temporal (Estrutura de Suporte) -->
-              <g opacity="0.92">
-                <path d="M 155 152 Q 245 148 338 144 C 385 112, 488 106, 535 128 C 555 82, 635 82, 652 135 C 685 150, 692 265, 655 292 C 620 322, 558 316, 528 286 C 492 292, 456 296, 434 304 L 408 398 L 372 398 L 398 294 C 368 286, 350 274, 338 260 Q 245 258 155 254 Z" fill="url(#temporalBoneGrad)" stroke="#c89f76" stroke-width="2" />
-                <path d="M 155 152 Q 245 148 338 144 C 385 112, 488 106, 535 128 C 555 82, 635 82, 652 135 C 685 150, 692 265, 655 292 C 620 322, 558 316, 528 286 C 492 292, 456 296, 434 304 L 408 398 L 372 398 L 398 294 C 368 286, 350 274, 338 260 Q 245 258 155 254 Z" fill="url(#boneTrabeculae)" />
+                <!-- Realce claro na hélice superior -->
+                <path d="M 148 64 C 102 68, 72 136, 70 232" fill="none" stroke="#ffe8da" stroke-width="5.5" stroke-linecap="round" opacity="0.6" />
+
+                <!-- Cavidade da Concha -->
+                <path d="M 218 318 C 164 312, 130 356, 128 432 C 126 502, 146 562, 192 586 C 212 568, 234 542, 246 518 L 246 414 C 226 404, 224 370, 246 350 Z" fill="url(#conchaInnerGrad)" />
+
+                <!-- Dobras internas esculpidas -->
+                <path d="M 112 292 C 110 208, 134 158, 162 162 C 186 166, 202 212, 208 256" fill="none" stroke="#8f4837" stroke-width="4.2" stroke-linecap="round" />
+                <path d="M 184 226 C 150 268, 118 348, 100 452" fill="none" stroke="#8f4837" stroke-width="4.2" stroke-linecap="round" />
+                <path d="M 218 316 C 164 310, 128 352, 124 426 C 120 502, 140 562, 188 588" fill="none" stroke="#8f4837" stroke-width="4.2" stroke-linecap="round" />
+
+                <!-- Brilho oval no lóbulo -->
+                <ellipse cx="166" cy="756" rx="22" ry="12" fill="#ffe4d4" opacity="0.45" />
               </g>
 
-              <!-- 1. Pavilhão Auricular (Anatomia Detalhada: Hélice, Anti-hélice, Concha, Trago e Lóbulo) -->
-              <g class="structure-group" data-id="pavilhao" onclick="selectStructure('pavilhao')" filter="url(#softShadow)">
-                <!-- Contorno Externo e Lóbulo -->
-                <path class="part-highlight" d="M 142 82 C 92 72, 58 122, 64 195 C 68 242, 76 276, 86 306 C 95 334, 126 346, 146 330 C 162 316, 158 288, 148 270 C 142 256, 146 240, 164 236 L 164 176 C 144 172, 148 134, 162 114 C 170 100, 160 86, 142 82 Z" fill="url(#pinnaSkinGrad)" stroke="#c26349" stroke-width="2.4" />
-                <!-- Dobra da Hélice Superior -->
-                <path d="M 148 96 C 104 88, 76 130, 80 192 C 82 222, 88 248, 96 268" fill="none" stroke="#b8573d" stroke-width="2.5" stroke-linecap="round" />
-                <!-- Anti-hélice (Dobra Interna) -->
-                <path d="M 134 118 C 106 118, 96 158, 100 198 C 103 228, 114 256, 130 264" fill="none" stroke="#c96a50" stroke-width="2.4" stroke-linecap="round" />
-                <!-- Concha da Orelha (Cavidade de Captação) -->
-                <path d="M 145 154 C 122 154, 114 178, 118 205 C 121 226, 132 238, 148 236" fill="#d97b62" fill-opacity="0.45" stroke="#b8573d" stroke-width="1.8" />
-                <!-- Trago (Pequena saliência anterior ao canal) -->
-                <path d="M 158 188 C 146 192, 146 218, 158 222" fill="#f8b496" stroke="#b8573d" stroke-width="2" stroke-linecap="round" />
-                <text x="112" y="364" text-anchor="middle" fill="#334155" font-size="12" font-weight="800">Pavilhão</text>
-              </g>
-
-              <!-- 2. Canal Auditivo Externo (Levemente curvo em "S" suave) -->
+              <!-- ============================================================= -->
+              <!-- 2. CANAL AUDITIVO                                             -->
+              <!-- ============================================================= -->
               <g class="structure-group" data-id="canal" onclick="selectStructure('canal')">
-                <path class="part-highlight" d="M 158 178 Q 245 170 336 174 L 336 236 Q 245 232 158 234 Z" fill="url(#canalGrad)" stroke="#b45309" stroke-width="2.2" />
-                <!-- Pequenos pelos e glândulas ceruminosas protetoras -->
-                <g stroke="#92400e" stroke-width="1.4" stroke-linecap="round" opacity="0.65">
-                  <line x1="184" y1="178" x2="189" y2="186" />
-                  <line x1="205" y1="176" x2="210" y2="184" />
-                  <line x1="188" y1="233" x2="193" y2="225" />
-                  <line x1="212" y1="232" x2="217" y2="224" />
+                <path class="part-highlight" d="M 240 416 C 324 416, 412 412, 502 404 C 538 400, 562 408, 578 420 L 598 530 C 538 512, 470 514, 398 534 C 332 550, 272 544, 236 534 Z" fill="url(#canalCoralGrad)" stroke="#6e2922" stroke-width="4" stroke-linejoin="round" />
+
+                <!-- Linhas de frente de onda internas no canal -->
+                <g fill="none" stroke="#fff1ec" stroke-width="4.2" stroke-linecap="round" opacity="0.82" pointer-events="none">
+                  <path d="M 278 438 Q 294 476 278 514" />
+                  <path d="M 352 434 Q 370 474 352 514" />
+                  <path d="M 426 430 Q 446 472 426 512" />
+                  <path d="M 498 428 Q 518 470 498 510" />
                 </g>
-                <ellipse cx="222" cy="176" rx="6" ry="2.2" fill="#f59e0b" opacity="0.85" />
-                <ellipse cx="235" cy="233" rx="5" ry="2" fill="#f59e0b" opacity="0.85" />
-                <text x="246" y="160" text-anchor="middle" fill="#334155" font-size="12" font-weight="800">Canal Auditivo</text>
               </g>
 
-              <!-- Ondas Sonoras Animadas (Frentes de Onda entrando na Concha e no Canal) -->
-              <g id="sound-waves" fill="none" stroke-linecap="round">
-                <path d="M 22 172 Q 38 205 22 238" stroke="#0284c7" stroke-width="3" opacity="0.55" />
-                <path d="M 40 158 Q 62 205 40 252" stroke="#0284c7" stroke-width="3.2" opacity="0.8" />
-                <path d="M 58 144 Q 86 205 58 266" stroke="#0369a1" stroke-width="3.5" />
-                <!-- Frentes de compressão viajando dentro do canal -->
-                <path d="M 178 188 Q 190 205 178 222" stroke="#ffffff" stroke-width="2.6" opacity="0.85" />
-                <path d="M 225 186 Q 238 205 225 224" stroke="#ffffff" stroke-width="2.8" opacity="0.9" />
-                <path d="M 272 186 Q 286 205 272 224" stroke="#ffffff" stroke-width="3" />
-                <path d="M 312 188 Q 324 205 312 222" stroke="#ffffff" stroke-width="2.6" opacity="0.85" />
+              <!-- Ondas Sonoras Animadas entrando na Concha e no Canal -->
+              <g id="sound-waves" fill="none" stroke-linecap="round" pointer-events="none">
+                <path d="M 154 436 Q 170 476 154 516" stroke="#7dd3fc" stroke-width="4.5" opacity="0.72" />
+                <path d="M 182 422 Q 202 476 182 530" stroke="#93c5fd" stroke-width="5" opacity="0.9" />
+                <path d="M 278 438 Q 294 476 278 514" stroke="#ffffff" stroke-width="3.6" opacity="0.75" />
+                <path d="M 352 434 Q 370 474 352 514" stroke="#ffffff" stroke-width="3.8" opacity="0.82" />
+                <path d="M 426 430 Q 446 472 426 512" stroke="#ffffff" stroke-width="4" opacity="0.88" />
+                <path d="M 498 428 Q 518 470 498 510" stroke="#ffffff" stroke-width="3.8" opacity="0.85" />
               </g>
 
-              <!-- Cavidade da Orelha Média (Fundo) -->
-              <path d="M 342 146 C 388 122, 484 120, 526 146 L 526 266 C 492 278, 456 282, 430 290 L 404 394 L 376 394 L 400 280 C 370 272, 352 260, 342 244 Z" fill="url(#middleEarCavity)" stroke="#d97706" stroke-width="1.6" />
-
-              <!-- 7. Tuba Auditiva (Trompa de Eustáquio) -->
+              <!-- ============================================================= -->
+              <!-- 7. TUBA AUDITIVA                                              -->
+              <!-- ============================================================= -->
               <g class="structure-group" data-id="tuba" onclick="selectStructure('tuba')">
-                <path class="part-highlight" d="M 402 272 L 376 394 L 404 394 L 428 280 Z" fill="#fcd34d" stroke="#b45309" stroke-width="2.2" />
-                <path d="M 412 285 L 390 388" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="4 4" />
-                <text x="322" y="388" text-anchor="middle" fill="#92400e" font-size="12" font-weight="800">Tuba Auditiva</text>
+                <path class="part-highlight" d="M 556 346 C 578 336, 606 338, 622 354 C 632 374, 640 406, 676 420 C 708 428, 728 442, 728 472 C 728 502, 746 524, 784 562 L 876 654 L 842 688 L 748 594 C 716 562, 688 554, 650 546 C 610 536, 584 498, 570 434 L 540 370 C 536 352, 544 348, 556 346 Z" fill="url(#cavityCoralGrad)" stroke="#6e2922" stroke-width="4" stroke-linejoin="round" />
+
+                <!-- Tuba Auditiva -->
+                <path d="M 712 528 L 860 674" fill="none" stroke="#5c211b" stroke-width="4.5" stroke-linecap="round" />
+                <ellipse cx="859" cy="671" rx="14" ry="24" transform="rotate(42 859 671)" fill="#b85348" stroke="#6e2922" stroke-width="3.2" />
+
+                <!-- Janela Redonda na parede medial da cavidade -->
+                <ellipse cx="696" cy="466" rx="12" ry="17" transform="rotate(-15 696 466)" fill="#9d6cb8" stroke="#47215e" stroke-width="3.5" />
               </g>
 
-              <!-- 3. Membrana Timpânica (Tímpano Cônico Translúcido) -->
-              <g id="tympanum-membrane" class="structure-group" data-id="timpano" onclick="selectStructure('timpano')" filter="url(#softShadow)">
-                <ellipse class="part-highlight" cx="340" cy="205" rx="11" ry="34" fill="url(#tympanumGrad)" stroke="#be123c" stroke-width="2.6" />
-                <!-- Anel Fibroso e Fibras Radiais do Tímpano -->
-                <ellipse cx="340" cy="205" rx="7" ry="24" fill="none" stroke="#ffe4e6" stroke-width="1" opacity="0.7" />
-                <circle cx="342" cy="205" r="3" fill="#be123c" opacity="0.75" />
-                <text x="332" y="262" text-anchor="middle" fill="#be123c" font-size="12" font-weight="800">Tímpano</text>
+              <!-- ============================================================= -->
+              <!-- 3. TÍMPANO                                                    -->
+              <!-- ============================================================= -->
+              <g id="tympanum-membrane" class="structure-group" data-id="timpano" onclick="selectStructure('timpano')">
+                <ellipse class="part-highlight" cx="598" cy="494" rx="42" ry="66" transform="rotate(-38 598 494)" fill="url(#tympanumTealGrad)" stroke="#2c5949" stroke-width="3.8" />
+                <ellipse cx="598" cy="494" rx="28" ry="46" transform="rotate(-38 598 494)" fill="none" stroke="#d1fae5" stroke-width="2" opacity="0.55" />
+                <path d="M 568 456 C 556 478, 564 514, 592 536" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" opacity="0.45" />
               </g>
 
-              <!-- Cadeia Ossicular Articulada (Martelo, Bigorna, Estribo) -->
-              <g id="ossicles-group" filter="url(#softShadow)">
-                <!-- 4. Martelo (Malleus - Cabo preso ao centro do tímpano e cabeça articulada) -->
+              <!-- ============================================================= -->
+              <!-- 4, 5 & 6. OSSÍCULOS (MARTELO, BIGORNA E ESTRIBO)              -->
+              <!-- ============================================================= -->
+              <g id="ossicles-group">
+                <!-- 4. Martelo -->
                 <g id="malleus-bone" class="structure-group" data-id="martelo" onclick="selectStructure('martelo')">
-                  <path class="part-highlight" d="M 342 204 L 382 172 C 386 160, 404 158, 406 172 C 408 182, 396 188, 388 184 L 348 212 Z" fill="url(#boneOssicleGrad)" stroke="#334155" stroke-width="2.2" stroke-linejoin="round" />
-                  <text x="382" y="148" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Martelo</text>
+                  <path class="part-highlight" d="M 562 354 C 580 352, 594 364, 594 380 C 594 392, 586 402, 584 410 C 584 424, 600 444, 620 468 C 626 474, 624 482, 616 482 C 610 482, 600 470, 586 454 C 570 434, 558 420, 558 402 C 558 390, 548 380, 546 368 C 544 358, 550 354, 562 354 Z" fill="url(#ossicleIvoryGrad)" stroke="#5c4d3c" stroke-width="3.6" stroke-linejoin="round" />
                 </g>
 
-                <!-- 5. Bigorna (Incus - Corpo articulado com o martelo e ramo longo descendo) -->
+                <!-- 5. Bigorna -->
                 <g id="incus-bone" class="structure-group" data-id="bigorna" onclick="selectStructure('bigorna')">
-                  <path class="part-highlight" d="M 404 166 C 424 156, 446 164, 446 180 C 446 194, 434 214, 432 224 L 420 220 C 422 204, 424 190, 405 182 Z" fill="url(#boneOssicleGrad)" stroke="#334155" stroke-width="2.2" stroke-linejoin="round" />
-                  <text x="442" y="148" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Bigorna</text>
+                  <path class="part-highlight" d="M 588 356 C 604 352, 620 366, 618 386 C 616 402, 618 414, 632 424 C 644 434, 658 438, 666 428 C 670 424, 674 430, 670 440 C 658 450, 636 446, 616 432 C 602 420, 592 408, 586 402 C 594 390, 596 372, 588 356 Z" fill="url(#ossicleIvoryGrad)" stroke="#5c4d3c" stroke-width="3.6" stroke-linejoin="round" />
                 </g>
 
-                <!-- 6. Estribo (Stapes - Arco anatômico com platina na Janela Oval) -->
+                <!-- 6. Estribo -->
                 <g id="stapes-piston-part" class="structure-group" data-id="estribo" onclick="selectStructure('estribo')">
-                  <path class="part-highlight" d="M 432 215 C 446 202, 466 200, 478 202 L 478 210 C 464 208, 448 210, 438 216 C 448 222, 464 224, 478 222 L 478 230 C 466 232, 446 230, 432 219 Z" fill="url(#boneOssicleGrad)" stroke="#1e293b" stroke-width="2" stroke-linejoin="round" />
-                  <!-- Platina do Estribo encaixada na Janela Oval -->
-                  <rect class="part-highlight" x="478" y="196" width="8" height="38" rx="4" fill="#ffffff" stroke="#1e293b" stroke-width="2.2" />
-                  <text x="482" y="252" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="800">Estribo</text>
+                  <path class="part-highlight" fill-rule="evenodd" d="M 656 428 C 664 414, 682 408, 700 410 C 708 411, 714 420, 714 428 C 714 436, 708 442, 698 440 C 684 438, 668 440, 658 438 Z M 670 428 C 678 418, 692 416, 702 418 L 702 430 C 692 430, 678 430, 670 428 Z" fill="url(#ossicleIvoryGrad)" stroke="#5c4d3c" stroke-width="3.4" stroke-linejoin="round" />
                 </g>
               </g>
 
-              <!-- 8. Canais Semicirculares & Vestíbulo (Labirinto Vestibular 3D) -->
-              <g class="structure-group" data-id="canais" onclick="selectStructure('canais')" filter="url(#softShadow)">
+              <!-- ============================================================= -->
+              <!-- 8. CANAIS SEMICIRCULARES                                      -->
+              <!-- ============================================================= -->
+              <g class="structure-group" data-id="canais" onclick="selectStructure('canais')">
                 <!-- Canal Posterior -->
-                <path class="part-highlight" d="M 552 162 C 550 98, 616 90, 618 146 C 619 166, 602 180, 586 182" fill="none" stroke="url(#labyrinthTubeGrad)" stroke-width="11" stroke-linecap="round" />
-                <path d="M 554 156 C 554 104, 612 96, 614 144" fill="none" stroke="#e0e7ff" stroke-width="2.2" stroke-linecap="round" opacity="0.7" />
+                <path class="part-highlight" d="M 676 388 C 638 384, 624 346, 638 322 C 654 296, 702 296, 738 318 C 752 328, 756 350, 746 372" fill="none" stroke="#47215e" stroke-width="24" stroke-linecap="round" />
+                <path d="M 676 388 C 638 384, 624 346, 638 322 C 654 296, 702 296, 738 318 C 752 328, 756 350, 746 372" fill="none" stroke="url(#labyrinthVioletGrad)" stroke-width="16" stroke-linecap="round" />
+
                 <!-- Canal Superior -->
-                <path class="part-highlight" d="M 518 175 C 492 118, 548 78, 576 122 C 588 140, 578 162, 565 170" fill="none" stroke="url(#labyrinthTubeGrad)" stroke-width="12" stroke-linecap="round" />
-                <path d="M 518 168 C 498 122, 546 86, 572 122" fill="none" stroke="#e0e7ff" stroke-width="2.4" stroke-linecap="round" opacity="0.75" />
+                <path class="part-highlight" d="M 730 378 C 720 322, 718 250, 746 244 C 770 238, 768 308, 754 378" fill="none" stroke="#47215e" stroke-width="24" stroke-linecap="round" />
+                <path d="M 730 378 C 720 322, 718 250, 746 244 C 770 238, 768 308, 754 378" fill="none" stroke="url(#labyrinthVioletGrad)" stroke-width="16" stroke-linecap="round" />
+
+                <!-- Vestíbulo -->
+                <path class="part-highlight" d="M 704 402 C 704 372, 730 356, 760 368 C 780 376, 784 408, 766 430 C 744 446, 716 442, 708 424 Z" fill="url(#labyrinthVioletGrad)" stroke="#47215e" stroke-width="4" />
+
                 <!-- Canal Lateral -->
-                <path class="part-highlight" d="M 532 182 C 512 154, 566 136, 594 166" fill="none" stroke="#818cf8" stroke-width="9" stroke-linecap="round" />
-                <!-- Vestíbulo e Ampolas -->
-                <ellipse cx="546" cy="194" rx="28" ry="22" fill="url(#labyrinthTubeGrad)" stroke="#312e81" stroke-width="2" />
-                <circle cx="520" cy="174" r="7" fill="#a5b4fc" stroke="#3730a3" stroke-width="1.5" />
-                <circle cx="556" cy="166" r="6.5" fill="#a5b4fc" stroke="#3730a3" stroke-width="1.5" />
-                <text x="568" y="84" text-anchor="middle" fill="#3730a3" font-size="12" font-weight="800">Canais Semicirculares</text>
+                <path class="part-highlight" d="M 654 370 C 648 356, 692 352, 738 368 C 750 372, 750 388, 728 390 C 698 390, 660 384, 654 370 Z" fill="none" stroke="#47215e" stroke-width="18" stroke-linejoin="round" />
+                <path d="M 654 370 C 648 356, 692 352, 738 368 C 750 372, 750 388, 728 390 C 698 390, 660 384, 654 370 Z" fill="none" stroke="#c89ce0" stroke-width="11" stroke-linejoin="round" />
               </g>
 
-              <!-- 9. Cóclea (Caracol Ósseo em Espiral 3D com Onda Líquida e Ponto Tonotópico) -->
-              <g class="structure-group" data-id="coclea" onclick="selectStructure('coclea')" filter="url(#softShadow)">
-                <!-- Concha Externa da Cóclea -->
-                <path class="part-highlight" d="M 552 212 C 542 252, 566 296, 612 296 C 656 296, 678 256, 668 218 C 658 182, 618 172, 586 184 L 486 198 L 486 232 Z" fill="url(#cochleaShellGrad)" stroke="#1e1b4b" stroke-width="2.5" />
-                <!-- Espiral Interna de 2,5 Voltas -->
-                <path d="M 558 228 C 562 192, 616 180, 646 206 C 672 228, 658 274, 622 278 C 592 282, 578 256, 592 234 C 602 218, 628 220, 630 238 C 632 250, 616 256, 610 246" fill="none" stroke="#e0e7ff" stroke-width="5.5" stroke-linecap="round" />
-                <!-- Onda Hidráulica Propagando na Endolinfa -->
-                <path id="cochlea-fluid-wave" d="M 494 214 L 558 228 C 562 192, 616 180, 646 206 C 672 228, 658 274, 622 278 C 592 282, 578 256, 592 234 C 602 218, 628 220, 630 238" fill="none" stroke="#38bdf8" stroke-width="3" stroke-linecap="round" />
-                <!-- Halo e Ponto Tonotópico Ativo na Espiral Coclear -->
-                <circle id="cochlea-active-halo" cx="628" cy="226" r="13" fill="#facc15" opacity="0.45" />
-                <circle id="cochlea-active-spot" cx="628" cy="226" r="6.5" fill="#fef08a" stroke="#ca8a04" stroke-width="2.2" filter="url(#glowYellow)" />
-                <text x="612" y="318" text-anchor="middle" fill="#312e81" font-size="13" font-weight="800">Cóclea</text>
+              <!-- ============================================================= -->
+              <!-- 9. CÓCLEA                                                     -->
+              <!-- ============================================================= -->
+              <g class="structure-group" data-id="coclea" onclick="selectStructure('coclea')">
+                <path class="part-highlight" d="M 742 432 C 744 400, 784 384, 822 394 C 862 406, 880 444, 868 484 C 858 522, 818 542, 778 532 C 748 526, 728 498, 732 464 C 734 450, 738 440, 742 432 Z" fill="url(#labyrinthVioletGrad)" stroke="#47215e" stroke-width="4.2" stroke-linejoin="round" />
+
+                <!-- Espiral interna -->
+                <path d="M 744 438 C 746 406, 784 390, 820 400 C 858 410, 872 446, 862 482 C 852 514, 816 530, 782 520 C 754 512, 742 484, 748 454 C 754 426, 784 414, 812 422 C 838 430, 846 458, 836 482 C 826 504, 798 506, 782 492 C 766 478, 768 450, 788 444 C 804 440, 816 454, 808 468 C 802 478, 790 476, 788 466" fill="none" stroke="#47215e" stroke-width="4.5" stroke-linecap="round" />
+
+                <!-- Onda hidráulica na endolinfa -->
+                <path id="cochlea-fluid-wave" d="M 724 428 C 738 428, 746 412, 768 402 C 804 392, 850 410, 856 452 C 862 492, 822 518, 784 510 C 754 502, 748 466, 762 442 C 776 422, 810 424, 824 448 C 834 470, 814 494, 792 486 C 776 478, 780 456, 796 462" fill="none" stroke="#38bdf8" stroke-width="3.8" stroke-linecap="round" />
+
+                <!-- Ponto tonotópico ativo -->
+                <circle id="cochlea-active-halo" cx="812" cy="422" r="15" fill="#facc15" opacity="0.45" />
+                <circle id="cochlea-active-spot" cx="812" cy="422" r="7.5" fill="#fef08a" stroke="#47215e" stroke-width="2.2" filter="url(#glowYellow)" />
               </g>
 
-              <!-- 10. Nervo Vestibulococlear & Córtex Auditivo Cerebral -->
-              <g class="structure-group" data-id="nervo" onclick="selectStructure('nervo')" filter="url(#softShadow)">
-                <!-- Silhueta Estilizada do Lobo Temporal (Cérebro) -->
-                <path d="M 758 136 C 782 118, 814 132, 816 168 C 818 202, 796 226, 768 222 C 756 220, 748 208, 750 192 C 744 172, 746 146, 758 136 Z" fill="url(#brainCortexGrad)" stroke="#be185d" stroke-width="2" />
-                <path d="M 768 152 Q 786 146 798 160 M 764 176 Q 784 170 796 184 M 768 198 Q 782 194 792 204" fill="none" stroke="#fdf2f8" stroke-width="1.8" stroke-linecap="round" opacity="0.8" />
+              <!-- ============================================================= -->
+              <!-- 10. NERVO AUDITIVO                                            -->
+              <!-- ============================================================= -->
+              <g class="structure-group" data-id="nervo" onclick="selectStructure('nervo')">
+                <!-- Ramo superior -->
+                <path class="part-highlight" d="M 766 376 C 820 382, 874 380, 908 388 L 1012 388 L 1012 406 L 908 404 C 874 406, 824 394, 768 390 Z" fill="url(#nerveOliveYellowGrad)" stroke="#3f5916" stroke-width="3.4" stroke-linejoin="round" />
 
-                <!-- Feixes Nervosos (Ramo Vestibular + Ramo Coclear -> VIII Par) -->
-                <path class="part-highlight" d="M 610 162 C 655 166, 685 174, 764 166 L 768 196 C 705 206, 672 222, 646 238 L 636 214 C 662 200, 678 192, 688 188 C 666 182, 636 178, 608 174 Z" fill="url(#nerveGrad)" stroke="#a16207" stroke-width="2" stroke-linejoin="round" />
+                <!-- Ramo inferior -->
+                <path class="part-highlight" d="M 858 416 C 892 410, 950 408, 1012 404 L 1012 448 C 954 454, 908 470, 864 488 C 868 464, 866 438, 858 416 Z" fill="url(#nerveOliveYellowGrad)" stroke="#3f5916" stroke-width="3.4" stroke-linejoin="round" />
 
-                <!-- Impulsos Bioelétricos Animados -->
-                <path id="nerve-impulses" d="M 644 224 C 686 204, 722 190, 774 180" fill="none" stroke="#ef4444" stroke-width="3.2" stroke-linecap="round" filter="url(#glowYellow)" />
-                <path id="nerve-impulses-2" d="M 616 168 C 668 172, 718 176, 774 172" fill="none" stroke="#f97316" stroke-width="2.6" stroke-linecap="round" />
+                <!-- Impulsos bioelétricos animados -->
+                <path id="nerve-impulses" d="M 864 446 C 914 434, 962 426, 1012 424" fill="none" stroke="#ef4444" stroke-width="4" stroke-linecap="round" filter="url(#glowYellow)" />
+                <path id="nerve-impulses-2" d="M 772 383 C 852 389, 932 394, 1012 394" fill="none" stroke="#f97316" stroke-width="3.2" stroke-linecap="round" />
+              </g>
 
-                <text x="716" y="142" text-anchor="middle" fill="#854d0e" font-size="11.5" font-weight="800">Nervo Auditivo</text>
-                <text x="782" y="240" text-anchor="middle" fill="#9d174d" font-size="11" font-weight="800">Córtex Cerebral</text>
+              <!-- ============================================================= -->
+              <!-- LEGENDAS & LINHAS-GUIA DO PROJETO INICIAL (CLICÁVEIS)         -->
+              <!-- ============================================================= -->
+              <g id="academic-callouts" font-family="'Inter', sans-serif">
+                <!-- Pavilhão Auricular -->
+                <g class="structure-group callout-item" data-id="pavilhao" onclick="selectStructure('pavilhao')">
+                  <line class="callout-line" x1="274" y1="162" x2="108" y2="300" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="108" cy="300" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="274" y="138" width="210" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="379" y="167" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Pavilhão Auricular</text>
+                </g>
+
+                <!-- Martelo -->
+                <g class="structure-group callout-item" data-id="martelo" onclick="selectStructure('martelo')">
+                  <line class="callout-line" x1="428" y1="282" x2="556" y2="376" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="556" cy="376" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="322" y="238" width="122" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="383" y="267" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Martelo</text>
+                </g>
+
+                <!-- Bigorna -->
+                <g class="structure-group callout-item" data-id="bigorna" onclick="selectStructure('bigorna')">
+                  <line class="callout-line" x1="538" y1="228" x2="594" y2="386" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="594" cy="386" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="456" y="184" width="124" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="518" y="213" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Bigorna</text>
+                </g>
+
+                <!-- Estribo -->
+                <g class="structure-group callout-item" data-id="estribo" onclick="selectStructure('estribo')">
+                  <line class="callout-line" x1="600" y1="98" x2="684" y2="432" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="684" cy="432" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="525" y="54" width="150" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="600" y="83" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Estribo</text>
+                </g>
+
+                <!-- Canais Semicirculares -->
+                <g class="structure-group callout-item" data-id="canais" onclick="selectStructure('canais')">
+                  <line class="callout-line" x1="846" y1="176" x2="758" y2="286" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="758" cy="286" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="780" y="102" width="218" height="74" rx="10" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="889" y="133" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Canais</text>
+                  <text class="callout-text" x="889" y="162" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Semicirculares</text>
+                </g>
+
+                <!-- Nervo Auditivo -->
+                <g class="structure-group callout-item" data-id="nervo" onclick="selectStructure('nervo')">
+                  <line class="callout-line" x1="924" y1="304" x2="904" y2="412" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="904" cy="412" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="836" y="230" width="172" height="74" rx="10" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="922" y="261" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Nervo</text>
+                  <text class="callout-text" x="922" y="290" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Auditivo</text>
+                </g>
+
+                <!-- Cóclea -->
+                <g class="structure-group callout-item" data-id="coclea" onclick="selectStructure('coclea')">
+                  <line class="callout-line" x1="884" y1="560" x2="818" y2="514" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="818" cy="514" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="854" y="536" width="128" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="918" y="565" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Cóclea</text>
+                </g>
+
+                <!-- Tuba Auditiva -->
+                <g class="structure-group callout-item" data-id="tuba" onclick="selectStructure('tuba')">
+                  <line class="callout-line" x1="884" y1="712" x2="824" y2="656" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="824" cy="656" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="844" y="712" width="160" height="74" rx="10" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="924" y="743" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Tuba</text>
+                  <text class="callout-text" x="924" y="772" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Auditiva</text>
+                </g>
+
+                <!-- Canal Auditivo -->
+                <g class="structure-group callout-item" data-id="canal" onclick="selectStructure('canal')">
+                  <line class="callout-line" x1="304" y1="656" x2="328" y2="478" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="328" cy="478" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="196" y="656" width="216" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="304" y="685" text-anchor="middle" fill="#ffffff" font-size="21" font-weight="700">Canal Auditivo</text>
+                </g>
+
+                <!-- Tímpano -->
+                <g class="structure-group callout-item" data-id="timpano" onclick="selectStructure('timpano')">
+                  <line class="callout-line" x1="518" y1="736" x2="594" y2="496" stroke="#ffffff" stroke-width="3" />
+                  <circle class="callout-dot" cx="594" cy="496" r="5" fill="#ffffff" stroke="#042133" stroke-width="2" />
+                  <rect x="448" y="736" width="140" height="44" rx="8" fill="url(#labelPillBg)" stroke="#1e4963" stroke-width="1.5" />
+                  <text class="callout-text" x="518" y="765" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Tímpano</text>
+                </g>
               </g>
             </svg>
           </div>
         </div>
 
-        <!-- Coluna Direita: Painel Detalhado da Estrutura Selecionada -->
-        <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
-          <div class="flex items-center justify-between gap-2">
-            <span id="detail-zone-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">
-              Orelha Interna
-            </span>
-            <span class="text-xs font-semibold text-slate-400">Ficha Anatômica</span>
-          </div>
-
-          <div>
-            <h2 id="detail-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
-              Cóclea &amp; Órgão de Corti
-            </h2>
-            <p id="detail-subtitle" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
-              Caracol biológico que converte vibração em eletricidade
-            </p>
-          </div>
-
-          <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
-            <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Conversão de Energia:</span>
-            <span id="detail-energy" class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
-              Hidráulica → Elétrica
-            </span>
-          </div>
-
-          <div class="space-y-2">
-            <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Função Biológica</h3>
-            <p id="detail-description" class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-              Estrutura óssea em espiral (2,5 voltas) cheia de líquido. As ondas criadas pelo estribo fazem vibrar a Membrana Basilar. No Órgão de Corti, cerca de 16.000 células ciliadas dobram seus estereocílios e geram sinais bioelétricos.
-            </p>
-          </div>
-
-          <div class="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 space-y-1.5">
-            <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs uppercase tracking-wider">
-              <i class="fa-solid fa-lightbulb"></i>
-              <span>Curiosidade Científica</span>
+        <!-- Coluna Direita: Painel Detalhado da Estrutura Selecionada + Controle de Frequência -->
+        <div class="lg:col-span-5 space-y-5">
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
+            <div class="flex items-center justify-between gap-2">
+              <span id="detail-zone-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300">
+                Orelha Interna
+              </span>
+              <span class="text-xs font-semibold text-slate-400">Ficha Anatômica</span>
             </div>
-            <p id="detail-curiosity" class="text-xs sm:text-sm text-amber-950 dark:text-amber-100 leading-relaxed">
-              A cóclea funciona como um prisma sonoro: a base rígida detecta agudos (até 20 kHz) e o ápice flexível detecta graves (até 20 Hz).
-            </p>
+
+            <div>
+              <h2 id="detail-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
+                Cóclea &amp; Órgão de Corti
+              </h2>
+              <p id="detail-subtitle" class="text-xs sm:text-sm font-medium text-indigo-600 dark:text-indigo-400 mt-1">
+                Caracol biológico que converte vibração em eletricidade
+              </p>
+            </div>
+
+            <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200/80 dark:border-slate-700 flex items-center justify-between">
+              <span class="text-xs font-semibold text-slate-500 dark:text-slate-400">Conversão de Energia:</span>
+              <span id="detail-energy" class="text-xs sm:text-sm font-extrabold text-slate-900 dark:text-white">
+                Hidráulica → Elétrica
+              </span>
+            </div>
+
+            <div class="space-y-2">
+              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Função Biológica</h3>
+              <p id="detail-description" class="text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                Estrutura óssea em espiral (2,5 voltas) cheia de líquido. As ondas criadas pelo estribo fazem vibrar a Membrana Basilar. No Órgão de Corti, cerca de 16.000 células ciliadas dobram seus estereocílios e geram sinais bioelétricos.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 space-y-1.5">
+              <div class="flex items-center gap-2 text-amber-800 dark:text-amber-300 font-bold text-xs uppercase tracking-wider">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>Curiosidade Científica</span>
+              </div>
+              <p id="detail-curiosity" class="text-xs sm:text-sm text-amber-950 dark:text-amber-100 leading-relaxed">
+                A cóclea funciona como um prisma sonoro: a base rígida detecta agudos (até 20 kHz) e o ápice flexível detecta graves (até 20 Hz).
+              </p>
+            </div>
+          </div>
+
+          <!-- Controle Rápido de Frequência (Hz) na Aba de Anatomia -->
+          <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-indigo-600 dark:text-indigo-400 text-xs"></i>
+                <label for="anatomia-freq-slider" class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                  Frequência do Som (Hz)
+                </label>
+              </div>
+              <div class="flex items-center gap-2">
+                <span id="anatomia-freq-badge" class="px-2 py-0.5 rounded-md text-[11px] font-semibold bg-indigo-100 dark:bg-indigo-900/60 text-indigo-700 dark:text-indigo-300">
+                  Médio / Voz Humana
+                </span>
+                <span id="anatomia-freq-display" class="text-sm font-extrabold text-indigo-600 dark:text-indigo-400">
+                  440 Hz
+                </span>
+              </div>
+            </div>
+
+            <input id="anatomia-freq-slider" type="range" min="100" max="8000" step="10" value="440" oninput="syncFrequencyFromAnatomia(this.value)" class="w-full accent-indigo-600 cursor-pointer" />
+
+            <div class="flex flex-wrap items-center justify-between gap-2 text-[11px] text-slate-500 dark:text-slate-400">
+              <span>100 Hz (Grave)</span>
+              <div class="flex items-center gap-1.5">
+                <button type="button" onclick="setQuickFrequency(180)" class="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 font-semibold text-slate-700 dark:text-slate-200 transition">
+                  180 Hz
+                </button>
+                <button type="button" onclick="setQuickFrequency(440)" class="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 font-semibold text-slate-700 dark:text-slate-200 transition">
+                  440 Hz
+                </button>
+                <button type="button" onclick="setQuickFrequency(6000)" class="px-2 py-0.5 rounded-md bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-indigo-400 font-semibold text-slate-700 dark:text-slate-200 transition">
+                  6.000 Hz
+                </button>
+              </div>
+              <span>8.000 Hz (Agudo)</span>
+            </div>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ===================================================================== -->
-    <!-- ABA 2: LABORATÓRIO ACÚSTICO (HZ & DB) + IDADE AUDITIVA                -->
+    <!-- ABA 2: LABORATÓRIO ACÚSTICO (HZ, DB, TONOTOPIA, OSCILOSCÓPIO & IDADE) -->
     <!-- ===================================================================== -->
     <section id="tab-acustica" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        <!-- Controles de Frequência e Intensidade -->
-        <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
-          <div class="flex flex-wrap items-center justify-between gap-3">
+        <!-- Gerador de Frequência & Intensidade -->
+        <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-2">
             <div>
               <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
-                Gerador de Ondas Sonoras
+                Gerador de Ondas Sonoras &amp; Tonotopia
               </h2>
-              <p class="text-xs text-slate-500 dark:text-slate-400">
-                Ajuste a frequência (altura) e os decibéis (volume) em tempo real
+              <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
+                Ajuste a frequência (Hz) e a intensidade (dB) para observar a onda e a resposta da cóclea.
               </p>
             </div>
+
             <button id="btn-audio-toggle" type="button" onclick="toggleAudioEngine()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
               <i id="audio-icon" class="fa-solid fa-volume-high"></i>
               <span id="audio-label">Ouvir Frequência</span>
             </button>
           </div>
 
-          <!-- Controle de Frequência -->
-          <div class="space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800">
+          <!-- Controle de Frequência (Hz) -->
+          <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <label for="freq-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500">Frequência (Hertz)</label>
-              <span id="freq-display" class="text-base font-extrabold text-indigo-600 dark:text-indigo-400">440 Hz</span>
+              <label for="freq-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Frequência (Altura do Som)
+              </label>
+              <div class="text-right">
+                <span id="freq-display" class="text-base sm:text-lg font-extrabold text-indigo-600 dark:text-indigo-400">440 Hz</span>
+                <span id="freq-category" class="block text-[11px] font-semibold text-slate-500 dark:text-slate-400">Médio / Voz Humana</span>
+              </div>
             </div>
             <input id="freq-slider" type="range" min="100" max="8000" step="10" value="440" oninput="updateAcousticParams()" class="w-full accent-indigo-600 cursor-pointer" />
             <div class="flex justify-between text-[11px] text-slate-400">
               <span>100 Hz (Grave)</span>
-              <span id="freq-category" class="font-semibold text-slate-600 dark:text-slate-300">Médio / Voz Humana</span>
+              <span>1.000 Hz (Médio)</span>
               <span>8.000 Hz (Agudo)</span>
             </div>
           </div>
 
-          <!-- Controle de Intensidade -->
-          <div class="space-y-2 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-800">
-            <div class="flex items-center justify-between">
-              <label for="db-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500">Intensidade (Decibéis)</label>
-              <span id="db-display" class="text-base font-extrabold text-amber-600 dark:text-amber-400">65 dB</span>
-            </div>
-            <input id="db-slider" type="range" min="20" max="120" step="1" value="65" oninput="updateAcousticParams()" class="w-full accent-amber-500 cursor-pointer" />
-            <div class="flex justify-between items-center text-[11px] text-slate-400">
-              <span>20 dB (Sussurro)</span>
-              <span id="db-safety" class="text-xs font-semibold text-amber-600">Moderado</span>
-              <span>120 dB (Show / Turbina)</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Osciloscópio & Mapa Tonotópico -->
-        <div class="lg:col-span-6 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
-          <div>
-            <h3 class="text-sm font-extrabold uppercase tracking-wider text-slate-500 mb-2">
-              Osciloscópio em Tempo Real
-            </h3>
-            <div class="w-full rounded-2xl bg-slate-950 p-3 border border-slate-800">
-              <canvas id="oscilloscope-canvas" class="w-full h-[150px] block"></canvas>
-            </div>
-          </div>
-
-          <!-- Tonotopia na Cóclea Desenrolada -->
+          <!-- Controle de Intensidade (dB) -->
           <div class="space-y-2">
             <div class="flex items-center justify-between">
-              <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Tonotopia na Membrana Basilar</span>
-              <span id="tonotopy-label" class="text-xs font-bold text-indigo-600 dark:text-indigo-400">Meio da Espiral (Médios)</span>
+              <label for="db-slider" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Intensidade Simulada (Volume)
+              </label>
+              <div class="text-right">
+                <span id="db-display" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">65 dB</span>
+                <span id="db-safety" class="block text-xs font-semibold text-amber-600 dark:text-amber-400">Moderado</span>
+              </div>
             </div>
-
-            <div class="relative h-10 rounded-2xl bg-gradient-to-r from-rose-500 via-indigo-500 to-sky-500 p-1 flex items-center justify-between px-4 text-[11px] font-bold text-white shadow-inner">
-              <span>Base (Agudos)</span>
-              <span>Ápice (Graves)</span>
-              <div id="tonotopy-cursor" style="left: 55%;" class="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-5 h-5 rounded-full bg-white border-4 border-slate-900 shadow-lg transition-all duration-200"></div>
+            <input id="db-slider" type="range" min="20" max="120" step="1" value="65" oninput="updateAcousticParams()" class="w-full accent-indigo-600 cursor-pointer" />
+            <div class="flex justify-between text-[11px] text-slate-400">
+              <span>20 dB (Sussurro)</span>
+              <span>85 dB (Limite Seguro)</span>
+              <span>120 dB (Risco Alto)</span>
             </div>
-            <p class="text-xs text-slate-500 dark:text-slate-400">
-              Sons agudos vibram a entrada rígida da cóclea; sons graves viajam até a ponta flexível do caracol.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Desafio da Idade Auditiva (8.000 Hz – 18.000 Hz) -->
-      <div class="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <span class="px-2.5 py-0.5 rounded-lg text-xs font-bold bg-purple-100 text-purple-800 dark:bg-purple-900/50 dark:text-purple-300">
-              Experimento Interativo com Visitantes
-            </span>
-            <h3 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mt-1">
-              Desafio da “Idade Auditiva” (8.000 Hz → 18.000 Hz)
-            </h3>
-            <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-              Inicie a varredura sonora e clique em <strong>“Parei de Ouvir!”</strong> assim que o apito agudo desaparecer para você.
-            </p>
           </div>
 
-          <div class="flex items-center gap-3">
-            <div class="px-4 py-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-center">
-              <span class="block text-[10px] uppercase font-bold text-slate-400">Frequência Atual</span>
-              <span id="sweep-freq-display" class="text-lg font-extrabold text-purple-600 dark:text-purple-400">8.000 Hz</span>
+          <!-- Osciloscópio Canvas -->
+          <div class="rounded-2xl bg-slate-950 border border-slate-800 p-3 space-y-1.5">
+            <div class="flex items-center justify-between text-[11px] text-slate-400 px-1">
+              <span class="font-bold uppercase tracking-wider text-indigo-400">Osciloscópio — Forma da Onda Senoidal</span>
+              <span>Tempo real</span>
             </div>
+            <canvas id="oscilloscope-canvas" class="w-full h-[150px] block rounded-xl"></canvas>
+          </div>
 
-            <button id="btn-sweep-start" type="button" onclick="toggleSweepTest()" class="px-4 py-3 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
-              <i class="fa-solid fa-play"></i>
-              <span>Iniciar Varredura</span>
-            </button>
-
-            <button id="btn-sweep-stop" type="button" onclick="stopSweepHere()" class="hidden px-4 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-extrabold shadow-md animate-bounce transition flex items-center gap-2">
-              <i class="fa-solid fa-hand"></i>
-              <span>Parei de Ouvir!</span>
-            </button>
+          <!-- Mapa de Tonotopia na Cóclea -->
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 space-y-2.5">
+            <div class="flex flex-wrap items-center justify-between gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Mapa Tonotópico da Cóclea
+              </span>
+              <span id="tonotopy-label" class="text-xs font-extrabold text-indigo-600 dark:text-indigo-400">
+                Ápice da Cóclea (Graves)
+              </span>
+            </div>
+            <div class="relative h-4 rounded-full bg-gradient-to-r from-sky-500 via-emerald-400 to-rose-500 overflow-visible">
+              <div id="tonotopy-cursor" style="left: 75%;" class="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-amber-300 border-2 border-slate-900 shadow-md transition-all duration-150"></div>
+            </div>
+            <div class="flex justify-between text-[11px] font-semibold text-slate-500 dark:text-slate-400">
+              <span>← Ápice (Graves)</span>
+              <span>Base (Agudos) →</span>
+            </div>
           </div>
         </div>
 
-        <div class="w-full h-3 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-          <div id="sweep-progress-bar" style="width: 0%;" class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 transition-all duration-150"></div>
-        </div>
+        <!-- Desafio da Idade Auditiva (8.000 Hz – 18.000 Hz) -->
+        <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col justify-between space-y-5">
+          <div class="space-y-4">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300">
+              <i class="fa-solid fa-ear-listen"></i>
+              <span>Experimento Interativo</span>
+            </div>
 
-        <div id="sweep-result-box" class="hidden p-4 rounded-2xl bg-purple-50 dark:bg-purple-950/40 border border-purple-200 dark:border-purple-800">
-          <h4 id="sweep-result-title" class="font-extrabold text-sm sm:text-base text-purple-900 dark:text-purple-200"></h4>
-          <p id="sweep-result-desc" class="text-xs sm:text-sm text-purple-800 dark:text-purple-300 mt-1"></p>
+            <div>
+              <h2 class="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+                Teste de Limite Agudo (Idade Auditiva)
+              </h2>
+              <p class="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">
+                A frequência sobe gradualmente de <strong>8.000 Hz</strong> até <strong>18.000 Hz</strong>. Clique em <strong>“Parei de Ouvir”</strong> assim que o som agudo deixar de ser audível para você.
+              </p>
+            </div>
+
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-3">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Frequência Atual</span>
+                <span id="sweep-freq-display" class="text-xl font-extrabold text-indigo-600 dark:text-indigo-400">8.000 Hz</span>
+              </div>
+              <div class="w-full h-2.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                <div id="sweep-progress-bar" style="width: 0%;" class="h-full bg-gradient-to-r from-sky-500 to-indigo-600 transition-all duration-150"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-400">
+                <span>8.000 Hz</span>
+                <span>13.000 Hz</span>
+                <span>18.000 Hz</span>
+              </div>
+            </div>
+
+            <div class="flex flex-wrap gap-2.5">
+              <button id="btn-sweep-start" type="button" onclick="toggleSweepTest()" class="flex-1 px-4 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-play"></i>
+                <span>Iniciar Varredura</span>
+              </button>
+
+              <button id="btn-sweep-stop" type="button" onclick="stopSweepHere()" class="hidden flex-1 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-hand"></i>
+                <span>Parei de Ouvir!</span>
+              </button>
+            </div>
+
+            <div id="sweep-result-box" class="hidden p-4 rounded-2xl bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200 dark:border-indigo-800 space-y-1.5">
+              <p id="sweep-result-title" class="text-sm font-extrabold text-indigo-900 dark:text-indigo-200"></p>
+              <p id="sweep-result-desc" class="text-xs text-indigo-800 dark:text-indigo-300 leading-relaxed"></p>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-2xl bg-amber-50/80 dark:bg-amber-950/30 border border-amber-200/80 dark:border-amber-800/50 text-xs text-amber-950 dark:text-amber-100 leading-relaxed">
+            <strong>Dica de Segurança:</strong> Use volume moderado no dispositivo e evite encostar alto-falantes de alta potência diretamente no ouvido.
+          </div>
         </div>
       </div>
     </section>
@@ -829,52 +1015,66 @@
     <!-- ===================================================================== -->
     <!-- ABA 3: SIMULADOR DE CONDIÇÕES AUDITIVAS                               -->
     <!-- ===================================================================== -->
-    <section id="tab-condicoes" class="hidden space-y-5">
+    <section id="tab-condicoes" class="hidden space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <div class="lg:col-span-5 space-y-2.5" id="condition-cards"></div>
+        <!-- Lista de Condições -->
+        <div class="lg:col-span-5 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-3">
+          <div>
+            <h2 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+              Condições e Situações Auditivas
+            </h2>
+            <p class="text-xs text-slate-500 dark:text-slate-400">
+              Selecione uma condição para ver o impacto biológico e ouvir a simulação sonora.
+            </p>
+          </div>
+          <div id="condition-cards" class="space-y-2.5"></div>
+        </div>
 
+        <!-- Detalhes e Simulação Sonora da Condição -->
         <div class="lg:col-span-7 bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-5">
-          <div class="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <span id="cond-type-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="space-y-1.5">
+              <span id="cond-type-badge" class="inline-block px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300">
                 Referência Fisiológica
               </span>
-              <h2 id="cond-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white mt-1.5">
+              <h2 id="cond-title" class="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-white">
                 Audição Saudável (20 Hz – 20 kHz)
               </h2>
             </div>
 
-            <button id="btn-cond-audio" type="button" onclick="toggleConditionAudio()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
+            <button id="btn-cond-audio" type="button" onclick="toggleConditionAudio()" class="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs sm:text-sm font-bold shadow-sm transition flex items-center gap-2">
               <i class="fa-solid fa-headphones"></i>
               <span>Ouvir Simulação Sonora</span>
             </button>
           </div>
 
-          <!-- Espectro Audível -->
-          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 space-y-2">
-            <div class="flex justify-between text-xs font-bold text-slate-500">
-              <span>Espectro de Frequências Preservado</span>
+          <p id="cond-desc" class="text-sm leading-relaxed text-slate-700 dark:text-slate-300"></p>
+
+          <!-- Indicador de Espectro Sonoro -->
+          <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-700 space-y-2">
+            <div class="flex items-center justify-between text-xs font-bold uppercase tracking-wider text-slate-400">
+              <span>Percepção Espectral</span>
+              <span>Faixa Auditiva</span>
             </div>
-            <div class="w-full h-3.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+            <div class="w-full h-3 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
               <div id="cond-spectrum-bar" style="width: 100%;" class="h-full rounded-full bg-emerald-500 transition-all duration-500"></div>
             </div>
-            <p id="cond-spectrum-label" class="text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Espectro completo: graves, médios e agudos nítidos
-            </p>
+            <p id="cond-spectrum-label" class="text-xs font-semibold text-slate-700 dark:text-slate-200"></p>
           </div>
 
-          <div class="space-y-3 text-sm">
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">O que acontece no ouvido?</h3>
-              <p id="cond-desc" class="text-slate-700 dark:text-slate-300 mt-1 leading-relaxed"></p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-700/80 space-y-1.5">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+                Impacto no Dia a Dia
+              </h3>
+              <p id="cond-impact" class="text-xs sm:text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></p>
             </div>
-            <div>
-              <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400">Impacto no dia a dia</h3>
-              <p id="cond-impact" class="text-slate-700 dark:text-slate-300 mt-1 leading-relaxed"></p>
-            </div>
-            <div class="p-3.5 rounded-2xl bg-sky-50 dark:bg-sky-950/30 border border-sky-200/80 dark:border-sky-800/50">
-              <h3 class="text-xs font-bold uppercase tracking-wider text-sky-700 dark:text-sky-300">Cuidado &amp; Prevenção</h3>
-              <p id="cond-prevention" class="text-xs sm:text-sm text-sky-950 dark:text-sky-100 mt-1"></p>
+
+            <div class="p-4 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/50 space-y-1.5">
+              <h3 class="text-xs font-extrabold uppercase tracking-wider text-emerald-700 dark:text-emerald-300">
+                Cuidado &amp; Prevenção
+              </h3>
+              <p id="cond-prevention" class="text-xs sm:text-sm text-emerald-950 dark:text-emerald-100 leading-relaxed"></p>
             </div>
           </div>
         </div>
@@ -1102,13 +1302,12 @@
           <path class="corti-fluid-line" d="M 30 28 Q 170 16 310 28 T 570 28" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="6 8" opacity="0.4" />
           <path class="corti-fluid-line" d="M 30 104 Q 170 94 310 104 T 570 104" fill="none" stroke="#38bdf8" stroke-width="1.6" stroke-dasharray="6 8" opacity="0.35" />
 
-          <!-- Membrana Tectória (Gelatinosa, posicionada logo acima dos estereocílios) -->
+          <!-- Membrana Tectória -->
           <path d="M 36 48 C 180 38, 380 42, 540 54 C 554 64, 548 84, 528 88 C 375 82, 180 80, 36 84 Z" fill="url(#tectoriaGrad)" stroke="#a5b4fc" stroke-width="1.5" />
           <text x="175" y="33" fill="#c7d2fe" font-size="12" font-weight="700">Membrana Tectória (Gelatinosa)</text>
 
           <!-- Células Ciliadas Esculpidas apoiadas sobre a Membrana Basilar -->
           <g id="corti-cilia-group">
-            <!-- Célula 1 -->
             <g class="corti-unit-1">
               <g class="corti-hair-body transition-all duration-500">
                 <rect x="122" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
@@ -1121,7 +1320,6 @@
                 <line x1="158" y1="116" x2="158" y2="81" />
               </g>
             </g>
-            <!-- Célula 2 -->
             <g class="corti-unit-2">
               <g class="corti-hair-body transition-all duration-500">
                 <rect x="224" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
@@ -1134,7 +1332,6 @@
                 <line x1="260" y1="116" x2="260" y2="81" />
               </g>
             </g>
-            <!-- Célula 3 -->
             <g class="corti-unit-3">
               <g class="corti-hair-body transition-all duration-500">
                 <rect x="326" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
@@ -1147,7 +1344,6 @@
                 <line x1="362" y1="116" x2="362" y2="82" />
               </g>
             </g>
-            <!-- Célula 4 -->
             <g class="corti-unit-4">
               <g class="corti-hair-body transition-all duration-500">
                 <rect x="428" y="116" width="48" height="66" rx="20" fill="url(#hairCellBodyGrad)" stroke="#bae6fd" stroke-width="1.5" />
@@ -1162,12 +1358,12 @@
             </g>
           </g>
 
-          <!-- Membrana Basilar (Sincronizada com as células ciliadas) -->
+          <!-- Membrana Basilar -->
           <g class="corti-basilar-anim">
             <rect x="36" y="182" width="528" height="14" rx="7" fill="url(#basilarGrad)" stroke="#a5b4fc" stroke-width="1" />
           </g>
 
-          <!-- Sinapses e Impulsos Elétricos Animados para o Nervo Auditivo -->
+          <!-- Sinapses e Impulsos Elétricos -->
           <g id="corti-sparks" class="transition-opacity duration-500">
             <path class="corti-spark-line" d="M 146 184 Q 210 208 290 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
             <path class="corti-spark-line" d="M 248 184 Q 270 204 296 220" fill="none" stroke="#facc15" stroke-width="2.6" stroke-dasharray="6 6" />
@@ -1188,7 +1384,7 @@
     </div>
   </div>
 
-  <!-- Toast / Notificação Discreta (substitui alert) -->
+  <!-- Toast / Notificação Discreta -->
   <div id="toast-box" class="fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 translate-y-4 opacity-0">
     <div class="bg-slate-900 dark:bg-slate-800 text-white px-4 py-3 rounded-2xl shadow-xl border border-slate-700 flex items-center gap-3 text-xs sm:text-sm max-w-sm">
       <i class="fa-solid fa-circle-info text-indigo-400 text-base"></i>
@@ -1214,7 +1410,7 @@
       },
       canal: {
         id: 'canal',
-        name: 'Canal Auditivo Externo',
+        name: 'Canal Auditivo',
         zone: 'Orelha Externa',
         zoneColor: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
         subtitle: 'Tubo ressonador de ~2,5 cm com proteção natural',
@@ -1225,7 +1421,7 @@
       },
       timpano: {
         id: 'timpano',
-        name: 'Membrana Timpânica (Tímpano)',
+        name: 'Tímpano (Membrana Timpânica)',
         zone: 'Orelha Externa → Média',
         zoneColor: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
         subtitle: 'Película tensa e semitransparente que vibra com o som',
@@ -1302,14 +1498,54 @@
       },
       nervo: {
         id: 'nervo',
-        name: 'Nervo Vestibulococlear (VIII Par)',
+        name: 'Nervo Auditivo',
         zone: 'Via Neural → Cérebro',
         zoneColor: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/50 dark:text-emerald-300',
         subtitle: 'Autoestrada de impulsos elétricos até o córtex auditivo',
         energy: 'Impulso Bioelétrico',
         tonotopyPos: 95,
-        description: 'Reúne milhares de fibras nervosas vindas da cóclea e do sistema vestibular, conduzindo potenciais de ação codificados em frequência e intensidade até o tronco encefálico e o lobo temporal do cérebro.',
+        description: 'Reúne milhares de fibras nervosas vindas da cóclea e do sistema vestibular (formando o nervo vestibulococlear, VIII par craniano), conduzindo potenciais de ação codificados em frequência e intensidade até o tronco encefálico e o lobo temporal do cérebro.',
         curiosity: 'O cérebro compara diferenças de microssegundos entre a chegada do som na orelha esquerda e na direita para calcular a direção exata da fonte.'
+      }
+    };
+
+    // Divisões anatômicas (Orelha Externa, Média e Interna)
+    const EAR_ZONES = {
+      externa: {
+        id: 'externa',
+        name: 'Orelha Externa (Captação Acústica)',
+        badge: 'Divisão 1 de 3 • Orelha Externa',
+        badgeClass: 'bg-sky-100 text-sky-800 dark:bg-sky-900/50 dark:text-sky-300',
+        subtitle: 'Pavilhão Auricular e Canal Auditivo Externo',
+        energy: 'Onda Sonora (Ar) → Condução',
+        structures: ['pavilhao', 'canal'],
+        defaultStructure: 'pavilhao',
+        description: 'Responsável por captar as ondas sonoras do ambiente, identificar sua direção e conduzi-las pelo canal auditivo até o tímpano. O formato tubular do canal ressoa e amplifica naturalmente as frequências da voz humana.',
+        curiosity: 'Sem o formato cheio de dobras do pavilhão auricular, teríamos muita dificuldade para saber se um som veio de cima, de baixo ou de trás.'
+      },
+      media: {
+        id: 'media',
+        name: 'Orelha Média (Amplificação Mecânica)',
+        badge: 'Divisão 2 de 3 • Orelha Média',
+        badgeClass: 'bg-amber-100 text-amber-800 dark:bg-amber-900/50 dark:text-amber-300',
+        subtitle: 'Tímpano (fronteira), Martelo, Bigorna, Estribo e Tuba Auditiva',
+        energy: 'Energia Acústica → Mecânica (22x)',
+        structures: ['timpano', 'martelo', 'bigorna', 'estribo', 'tuba'],
+        defaultStructure: 'timpano',
+        description: 'Inicia-se na membrana timpânica (fronteira com a orelha externa) e abriga os três menores ossos do corpo humano (martelo, bigorna e estribo), que atuam como alavancas multiplicando a pressão sonora em cerca de 22 vezes para vencer a resistência do líquido da orelha interna.',
+        curiosity: 'A tuba auditiva conecta essa cavidade à garganta e se abre quando bocejamos ou engolimos, equilibrando a pressão do ar em viagens de avião ou serra.'
+      },
+      interna: {
+        id: 'interna',
+        name: 'Orelha Interna (Transdução & Equilíbrio)',
+        badge: 'Divisão 3 de 3 • Orelha Interna',
+        badgeClass: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-300',
+        subtitle: 'Cóclea, Canais Semicirculares e Nervo Auditivo',
+        energy: 'Hidráulica → Impulso Bioelétrico',
+        structures: ['canais', 'coclea', 'nervo'],
+        defaultStructure: 'coclea',
+        description: 'Aloja o labirinto ósseo e membranoso: os canais semicirculares informam ao cérebro sobre o equilíbrio e os movimentos da cabeça, enquanto a cóclea converte as ondas do líquido em impulsos elétricos enviados pelo nervo auditivo.',
+        curiosity: 'Dentro da cóclea existem cerca de 16.000 células ciliadas organizadas por frequência (tonotopia), funcionando como um piano biológico.'
       }
     };
 
@@ -1344,7 +1580,7 @@
       {
         structure: 'nervo',
         title: '5. Do Impulso Elétrico à Consciência',
-        speech: '“Por fim, as células ciliadas disparam sinais bioelétricos pelo Nervo Vestibulococlear até o córtex auditivo no lobo temporal, onde o cérebro transforma eletricidade em música, fala e emoção.”',
+        speech: '“Por fim, as células ciliadas disparam sinais bioelétricos pelo Nervo Auditivo até o córtex auditivo no lobo temporal, onde o cérebro transforma eletricidade em música, fala e emoção.”',
         tip: 'Convide os avaliadores a testarem o Microfone ao Vivo ou o Quiz de 20 questões!'
       }
     ];
@@ -1412,7 +1648,7 @@
         tinnitus: true,
         spectrumWidth: '78%',
         spectrumColor: 'bg-purple-500',
-        spectrumLabel: 'Apito contínuo agudo (~4.500 Hz) sobreposto aos sons reais',
+        spectrumLabel: 'Apito contínuo agudo (~4.600 Hz) sobreposto aos sons reais',
         desc: 'Quando células ciliadas sofrem estresse ou lesão, fibras do nervo auditivo passam a disparar impulsos elétricos espontâneos mesmo no silêncio absoluto.',
         impact: 'Percepção constante de apito, chiado ou cigarra que dificulta a concentração e o sono.',
         prevention: 'Evite exposição súbita a explosões/caixas de som e procure um otorrinolaringologista se o apito durar mais de 24h.'
@@ -1532,11 +1768,11 @@
         options: [
           'Nervo Óptico (II par)',
           'Nervo Vago (X par)',
-          'Nervo Vestibulococlear (VIII par)',
+          'Nervo Vestibulococlear / Auditivo (VIII par)',
           'Nervo Trigêmeo (V par)'
         ],
         answer: 2,
-        explanation: 'O VIII par craniano (vestibulococlear) reúne fibras da cóclea e do sistema vestibular.'
+        explanation: 'O VIII par craniano (nervo vestibulococlear ou auditivo) reúne fibras da cóclea e dos canais semicirculares até o cérebro.'
       },
       {
         q: 'O que acontece quando células ciliadas humanas são destruídas por exposição a sons muito altos?',
@@ -1666,8 +1902,10 @@
     // 5. ESTADO GLOBAL DA APLICAÇÃO
     // =========================================================================
     let selectedStructureId = 'coclea';
+    let selectedZoneId = 'all';
     let currentGuideStep = 0;
     let isWaveAnimating = true;
+    let areCalloutLabelsVisible = true;
 
     // Estado de Áudio & Microfone
     let audioCtx = null;
@@ -1698,21 +1936,22 @@
     let condGain = null;
     let condTinnitusOsc = null;
 
-    // Pontos ao longo da espiral da Cóclea (Base -> Ápice) para visualização tonotópica
+    // Pontos calibrados ao longo da espiral da Cóclea (Base -> Ápice)
     const COCHLEA_SPIRAL_POINTS = [
-      { x: 564, y: 224 }, // Base (Agudos extremos)
-      { x: 582, y: 198 },
-      { x: 618, y: 194 },
-      { x: 648, y: 212 },
-      { x: 656, y: 244 },
-      { x: 636, y: 272 },
-      { x: 602, y: 274 },
-      { x: 586, y: 248 },
-      { x: 600, y: 224 },
-      { x: 626, y: 228 },
-      { x: 624, y: 248 },
-      { x: 610, y: 244 }  // Ápice (Graves profundos)
+      { x: 746, y: 436 }, // Base (Agudos extremos)
+      { x: 768, y: 408 },
+      { x: 814, y: 406 },
+      { x: 852, y: 438 },
+      { x: 850, y: 486 },
+      { x: 810, y: 514 },
+      { x: 764, y: 502 },
+      { x: 754, y: 460 },
+      { x: 782, y: 432 },
+      { x: 822, y: 446 },
+      { x: 818, y: 482 },
+      { x: 794, y: 468 }  // Ápice (Graves profundos)
     ];
+
     let oscCanvas = null;
     let oscCtx = null;
     let oscPhase = 0;
@@ -1783,7 +2022,12 @@
       if (!container) return;
       container.innerHTML = '';
 
-      Object.values(STRUCTURES).forEach(st => {
+      const zoneObj = selectedZoneId !== 'all' ? EAR_ZONES[selectedZoneId] : null;
+      const list = zoneObj
+        ? zoneObj.structures.map(id => STRUCTURES[id]).filter(Boolean)
+        : Object.values(STRUCTURES);
+
+      list.forEach(st => {
         const btn = document.createElement('button');
         btn.id = `pill-${st.id}`;
         btn.type = 'button';
@@ -1794,10 +2038,114 @@
       });
     }
 
+    function updateZoneButtonsUI() {
+      const configs = {
+        externa: {
+          btn: document.getElementById('zone-btn-externa'),
+          active: 'px-3 py-1.5 rounded-xl bg-sky-600 text-white border border-sky-600 shadow-sm transition flex items-center gap-1.5 cursor-pointer font-bold',
+          idle: 'px-3 py-1.5 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 dark:bg-sky-900/50 dark:hover:bg-sky-800/70 dark:text-sky-300 border border-sky-300/70 dark:border-sky-700/60 transition flex items-center gap-1.5 cursor-pointer'
+        },
+        media: {
+          btn: document.getElementById('zone-btn-media'),
+          active: 'px-3 py-1.5 rounded-xl bg-amber-600 text-white border border-amber-600 shadow-sm transition flex items-center gap-1.5 cursor-pointer font-bold',
+          idle: 'px-3 py-1.5 rounded-xl bg-amber-100 hover:bg-amber-200 text-amber-800 dark:bg-amber-900/50 dark:hover:bg-amber-800/70 dark:text-amber-300 border border-amber-300/70 dark:border-amber-700/60 transition flex items-center gap-1.5 cursor-pointer'
+        },
+        interna: {
+          btn: document.getElementById('zone-btn-interna'),
+          active: 'px-3 py-1.5 rounded-xl bg-indigo-600 text-white border border-indigo-600 shadow-sm transition flex items-center gap-1.5 cursor-pointer font-bold',
+          idle: 'px-3 py-1.5 rounded-xl bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-900/50 dark:hover:bg-indigo-800/70 dark:text-indigo-300 border border-indigo-300/70 dark:border-indigo-700/60 transition flex items-center gap-1.5 cursor-pointer'
+        }
+      };
+
+      Object.entries(configs).forEach(([key, cfg]) => {
+        if (cfg.btn) {
+          cfg.btn.className = selectedZoneId === key ? cfg.active : cfg.idle;
+        }
+      });
+
+      const clearBtn = document.getElementById('btn-clear-zone');
+      const filterLabel = document.getElementById('pills-filter-label');
+      if (selectedZoneId === 'all') {
+        if (clearBtn) clearBtn.classList.add('hidden');
+        if (filterLabel) filterLabel.textContent = 'Clique em qualquer estrutura ou legenda na ilustração, ou selecione abaixo:';
+      } else {
+        const z = EAR_ZONES[selectedZoneId];
+        if (clearBtn) clearBtn.classList.remove('hidden');
+        if (filterLabel && z) filterLabel.textContent = `Filtrando estruturas da ${z.name.split(' (')[0]} (clique novamente no botão para mostrar todas):`;
+      }
+    }
+
+    function applyZoneVisualsOnSvg(zoneId) {
+      const zoneObj = zoneId !== 'all' ? EAR_ZONES[zoneId] : null;
+      document.querySelectorAll('.structure-group').forEach(el => {
+        const partId = el.getAttribute('data-id');
+        el.classList.remove('zone-highlight', 'zone-dimmed');
+        if (!zoneObj) return;
+        if (zoneObj.structures.includes(partId)) {
+          el.classList.add('zone-highlight');
+        } else {
+          el.classList.add('zone-dimmed');
+        }
+      });
+    }
+
+    function selectZone(zoneId) {
+      // Clicar novamente na mesma região volta para a exibição completa
+      if (zoneId === selectedZoneId && zoneId !== 'all') {
+        zoneId = 'all';
+      }
+      selectedZoneId = zoneId;
+      updateZoneButtonsUI();
+      renderStructurePills();
+
+      if (zoneId === 'all') {
+        applyZoneVisualsOnSvg('all');
+        selectStructure(selectedStructureId);
+        return;
+      }
+
+      const z = EAR_ZONES[zoneId];
+      if (!z) return;
+
+      // Destaca apenas a região selecionada no SVG e atualiza o painel lateral com o resumo da divisão
+      document.querySelectorAll('.structure-group').forEach(el => {
+        el.classList.remove('active-part');
+      });
+      applyZoneVisualsOnSvg(zoneId);
+
+      const badge = document.getElementById('detail-zone-badge');
+      if (badge) {
+        badge.textContent = z.badge;
+        badge.className = `inline-block px-2.5 py-1 rounded-lg text-xs font-bold ${z.badgeClass}`;
+      }
+      const titleEl = document.getElementById('detail-title');
+      if (titleEl) titleEl.textContent = z.name;
+
+      const subEl = document.getElementById('detail-subtitle');
+      if (subEl) subEl.textContent = z.subtitle;
+
+      const energyEl = document.getElementById('detail-energy');
+      if (energyEl) energyEl.textContent = z.energy;
+
+      const descEl = document.getElementById('detail-description');
+      if (descEl) descEl.textContent = z.description;
+
+      const curEl = document.getElementById('detail-curiosity');
+      if (curEl) curEl.textContent = z.curiosity;
+    }
+
     function selectStructure(id) {
       const st = STRUCTURES[id];
       if (!st) return;
       selectedStructureId = id;
+
+      // Se houver filtro de região ativo e a estrutura clicada pertencer a outra região, restaura visão geral
+      if (selectedZoneId !== 'all' && EAR_ZONES[selectedZoneId] && !EAR_ZONES[selectedZoneId].structures.includes(id)) {
+        selectedZoneId = 'all';
+        updateZoneButtonsUI();
+        renderStructurePills();
+        applyZoneVisualsOnSvg('all');
+      }
 
       Object.keys(STRUCTURES).forEach(key => {
         const pill = document.getElementById(`pill-${key}`);
@@ -1858,6 +2206,21 @@
       if (icon && label) {
         icon.className = isWaveAnimating ? 'fa-solid fa-pause' : 'fa-solid fa-play';
         label.textContent = isWaveAnimating ? 'Pausar Ondas' : 'Retomar Ondas';
+      }
+    }
+
+    function toggleCalloutLabels() {
+      areCalloutLabelsVisible = !areCalloutLabelsVisible;
+      const icon = document.getElementById('labels-icon');
+      const label = document.getElementById('labels-label');
+
+      document.querySelectorAll('.callout-text').forEach(el => {
+        el.style.opacity = areCalloutLabelsVisible ? '1' : '0';
+      });
+
+      if (icon && label) {
+        icon.className = areCalloutLabelsVisible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+        label.textContent = areCalloutLabelsVisible ? 'Ocultar Legendas' : 'Mostrar Legendas';
       }
     }
 
@@ -1987,7 +2350,6 @@
         }
         if (earSvg) earSvg.classList.remove('mic-driven');
 
-        // Restaura estilos inline para que a animação CSS volte suavemente
         const tymp = document.getElementById('tympanum-membrane');
         const oss = document.getElementById('ossicles-group');
         const stapes = document.getElementById('stapes-piston-part');
@@ -2063,17 +2425,14 @@
       micAnalyser.getByteTimeDomainData(micTimeArray);
       micAnalyser.getByteFrequencyData(micDataArray);
 
-      // Calcula amplitude instantânea (RMS) para reação imediata a voz e palmas
       let sumSquares = 0;
       for (let i = 0; i < micTimeArray.length; i++) {
         const norm = (micTimeArray[i] - 128) / 128;
         sumSquares += norm * norm;
       }
       const rms = Math.sqrt(sumSquares / micTimeArray.length);
-      // Amplifica sensibilidade para captar fala normal com clareza
       const level = Math.min(1, rms * 5.2);
 
-      // Encontra frequência dominante
       let maxVal = 0;
       let maxIdx = 1;
       for (let i = 2; i < micDataArray.length; i++) {
@@ -2090,19 +2449,16 @@
       const statusText = document.getElementById('model-status-text');
       const statusDot = document.getElementById('model-status-dot');
 
-      // Animação direta das ondas sonoras no canal auditivo
       micWavePhase += 0.12 + level * 0.45;
       if (waves) {
-        const waveX = Math.sin(micWavePhase) * (6 + level * 16);
+        const waveX = Math.sin(micWavePhase) * (8 + level * 20);
         waves.style.transform = `translateX(${waveX.toFixed(1)}px)`;
         waves.style.opacity = (0.15 + level * 0.85).toFixed(2);
-        waves.style.strokeWidth = (2 + level * 3.5).toFixed(1);
       }
 
-      // Vibração proporcional do tímpano, alavanca dos ossículos e pistão do estribo
-      const tympScale = 1 + level * 0.34;
+      const tympScale = 1 + level * 0.24;
       const ossShift = level * 8;
-      const ossRot = level * 6.5;
+      const ossRot = level * 5.5;
       if (tymp) tymp.style.transform = `scale(${tympScale.toFixed(3)})`;
       if (oss) oss.style.transform = `translateX(${ossShift.toFixed(1)}px) rotate(${ossRot.toFixed(1)}deg)`;
       if (stapes) stapes.style.transform = `translateX(${(ossShift * 1.15).toFixed(1)}px)`;
@@ -2226,22 +2582,36 @@
 
     function updateAcousticParams(fromMic = false, micLevel = 0) {
       const freqSlider = document.getElementById('freq-slider');
+      const anatomiaFreqSlider = document.getElementById('anatomia-freq-slider');
       const dbSlider = document.getElementById('db-slider');
-      const freq = Number(freqSlider?.value || 440);
+      const freq = Number(freqSlider?.value || anatomiaFreqSlider?.value || 440);
       const db = Number(dbSlider?.value || 65);
+
+      if (freqSlider && String(freqSlider.value) !== String(freq)) {
+        freqSlider.value = freq;
+      }
+      if (anatomiaFreqSlider && String(anatomiaFreqSlider.value) !== String(freq)) {
+        anatomiaFreqSlider.value = freq;
+      }
+
+      let categoryLabel = 'Médio / Voz Humana';
+      if (freq < 300) {
+        categoryLabel = 'Grave (Baixa Frequência)';
+      } else if (freq <= 2000) {
+        categoryLabel = 'Médio / Voz Humana';
+      } else {
+        categoryLabel = 'Agudo (Alta Frequência)';
+      }
 
       const freqDisplay = document.getElementById('freq-display');
       const freqCategory = document.getElementById('freq-category');
       if (freqDisplay) freqDisplay.textContent = `${freq.toLocaleString('pt-BR')} Hz`;
-      if (freqCategory) {
-        if (freq < 300) {
-          freqCategory.textContent = 'Grave (Baixa Frequência)';
-        } else if (freq <= 2000) {
-          freqCategory.textContent = 'Médio / Voz Humana';
-        } else {
-          freqCategory.textContent = 'Agudo (Alta Frequência)';
-        }
-      }
+      if (freqCategory) freqCategory.textContent = categoryLabel;
+
+      const anatomiaFreqDisplay = document.getElementById('anatomia-freq-display');
+      const anatomiaFreqBadge = document.getElementById('anatomia-freq-badge');
+      if (anatomiaFreqDisplay) anatomiaFreqDisplay.textContent = `${freq.toLocaleString('pt-BR')} Hz`;
+      if (anatomiaFreqBadge) anatomiaFreqBadge.textContent = categoryLabel;
 
       const dbDisplay = document.getElementById('db-display');
       const dbSafety = document.getElementById('db-safety');
@@ -2259,14 +2629,12 @@
         }
       }
 
-      // Atualiza oscilador em tempo real caso o gerador sonoro esteja ativo
       if (!fromMic && isAudioPlaying && oscillator && gainNode && audioCtx) {
         oscillator.frequency.setTargetAtTime(freq, audioCtx.currentTime, 0.03);
         const normalizedGain = Math.min(0.25, Math.max(0.005, ((db - 20) / 100) * 0.22));
         gainNode.gain.setTargetAtTime(normalizedGain, audioCtx.currentTime, 0.03);
       }
 
-      // Atualiza cursor tonotópico na membrana basilar (Base = Agudos à esquerda, Ápice = Graves à direita)
       const ratio = (Math.log10(Math.max(100, freq)) - Math.log10(100)) / (Math.log10(8000) - Math.log10(100));
       const clamped = Math.max(0, Math.min(1, ratio));
       const cursor = document.getElementById('tonotopy-cursor');
@@ -2288,7 +2656,6 @@
       const intensityNorm = fromMic ? micLevel : Math.max(0, Math.min(1, (db - 20) / 100));
       updateCochleaSpiralSpot(freq, intensityNorm);
 
-      // Atualiza medidor visual e parâmetros de vibração do diagrama SVG
       const vuBar = document.getElementById('model-vu-bar');
       if (vuBar) {
         vuBar.style.width = `${Math.round(Math.max(6, intensityNorm * 100))}%`;
@@ -2298,9 +2665,9 @@
         const waveDur = Math.max(0.35, 2.0 - clamped * 1.5);
         const vibDur = Math.max(0.18, 0.95 - clamped * 0.72);
         const nerveDur = Math.max(0.28, 1.3 - intensityNorm * 0.9);
-        const tympScale = 1.03 + intensityNorm * 0.16;
+        const tympScale = 1.03 + intensityNorm * 0.14;
         const ossShift = 1.5 + intensityNorm * 5.0;
-        const ossRot = 1.5 + intensityNorm * 4.5;
+        const ossRot = 1.5 + intensityNorm * 4.0;
 
         const rootStyle = document.documentElement.style;
         rootStyle.setProperty('--wave-dur', `${waveDur.toFixed(2)}s`);
@@ -2332,7 +2699,6 @@
 
       const ratio = (Math.log10(Math.max(100, freq)) - Math.log10(100)) / (Math.log10(8000) - Math.log10(100));
       const clamped = Math.max(0, Math.min(1, ratio));
-      // clamped = 1 -> Base (índice 0); clamped = 0 -> Ápice (último índice)
       const exactIdx = (1 - clamped) * (COCHLEA_SPIRAL_POINTS.length - 1);
       const idx0 = Math.floor(exactIdx);
       const idx1 = Math.min(COCHLEA_SPIRAL_POINTS.length - 1, idx0 + 1);
@@ -2345,12 +2711,12 @@
 
       spot.setAttribute('cx', x.toFixed(1));
       spot.setAttribute('cy', y.toFixed(1));
-      spot.setAttribute('r', (4.8 + intensityNorm * 4.2).toFixed(1));
+      spot.setAttribute('r', (6.0 + intensityNorm * 5.0).toFixed(1));
 
       if (halo) {
         halo.setAttribute('cx', x.toFixed(1));
         halo.setAttribute('cy', y.toFixed(1));
-        halo.setAttribute('r', (10 + intensityNorm * 8).toFixed(1));
+        halo.setAttribute('r', (12 + intensityNorm * 10).toFixed(1));
       }
     }
 
@@ -2418,6 +2784,7 @@
       }
 
       try {
+        if (isMicActive) await toggleMicInput();
         stopMainAudio();
         stopConditionAudio();
 
@@ -2594,6 +2961,7 @@
       }
 
       try {
+        if (isMicActive) await toggleMicInput();
         stopMainAudio();
         stopSweepAudio();
 
@@ -2780,10 +3148,26 @@
       renderQuiz();
     }
 
+    function syncFrequencyFromAnatomia(val) {
+      const freqSlider = document.getElementById('freq-slider');
+      if (freqSlider) freqSlider.value = Number(val);
+      updateAcousticParams(false);
+    }
+
+    function setQuickFrequency(hz) {
+      const anatomiaFreqSlider = document.getElementById('anatomia-freq-slider');
+      const freqSlider = document.getElementById('freq-slider');
+      if (anatomiaFreqSlider) anatomiaFreqSlider.value = hz;
+      if (freqSlider) freqSlider.value = hz;
+      updateAcousticParams(false);
+    }
+
     // Exposição explícita no escopo global (window)
     window.switchTab = switchTab;
+    window.selectZone = selectZone;
     window.selectStructure = selectStructure;
     window.toggleWaveAnimation = toggleWaveAnimation;
+    window.toggleCalloutLabels = toggleCalloutLabels;
     window.toggleGuideModal = toggleGuideModal;
     window.prevGuideStep = prevGuideStep;
     window.nextGuideStep = nextGuideStep;
@@ -2793,6 +3177,8 @@
     window.toggleMicInput = toggleMicInput;
     window.toggleAudioEngine = toggleAudioEngine;
     window.updateAcousticParams = updateAcousticParams;
+    window.syncFrequencyFromAnatomia = syncFrequencyFromAnatomia;
+    window.setQuickFrequency = setQuickFrequency;
     window.toggleSweepTest = toggleSweepTest;
     window.stopSweepHere = stopSweepHere;
     window.selectCondition = selectCondition;
